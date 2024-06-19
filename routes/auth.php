@@ -12,7 +12,7 @@ use App\Http\Controllers\Auth\VerifyEmailController;
 use App\Http\Controllers\Admin;
 use Illuminate\Support\Facades\Route;
 
-Route::middleware(['guest','guest:admin'])->group(function () {
+Route::middleware(['guest', 'guest:admin'])->group(function () {
     Route::get('register', [RegisteredUserController::class, 'create'])
                 ->name('register');
 
@@ -36,13 +36,12 @@ Route::middleware(['guest','guest:admin'])->group(function () {
                 ->name('password.store');
 });
 
-Route::middleware('guest:admin')->group(function(){
-    Route::get('admin/login',[Admin\Auth\AuthenticatedSessionController::class, 'create'])
+Route::middleware('guest:admin')->group(function () {
+    Route::get('admin/login', [Admin\Auth\AuthenticatedSessionController::class, 'create'])
                 ->name('admin.login');
 
     Route::post('admin/login', [Admin\Auth\AuthenticatedSessionController::class, 'store']);
 });
-
 
 Route::middleware('auth')->group(function () {
     Route::get('verify-email', EmailVerificationPromptController::class)
@@ -67,7 +66,14 @@ Route::middleware('auth')->group(function () {
                 ->name('logout');
 });
 
-Route::middleware('auth:admin')->group(function(){
-    Route::post('admin/logout',[Admin\Auth\AuthenticatedSessionController::class,'destroy'])
+Route::middleware('auth:admin')->group(function () {
+    Route::post('admin/logout', [Admin\Auth\AuthenticatedSessionController::class, 'destroy'])
                 ->name('admin.logout');
 });
+
+//Route::get('admin/index', [Admin\UserController::class, 'index'])
+//            ->name('admin.users.index');
+
+//Route::get('admin/show/{$user}', [Admin\UserController::class, 'show'])
+//            ->name('admin.users.show');
+
