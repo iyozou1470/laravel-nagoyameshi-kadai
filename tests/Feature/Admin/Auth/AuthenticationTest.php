@@ -32,8 +32,9 @@ class AuthenticationTest extends TestCase
              'email' => $admin->email,
              'password' => 'nagoyameshi',
          ]);
- 
-         $this->assertTrue(Auth::guard('admin')->check());
+         
+         // 正しいガードを使用しているか確認
+         $this->assertTrue(Auth::guard('admin')->check(), 'The admin should be authenticated');
          $response->assertRedirect(RouteServiceProvider::ADMIN_HOME);
      }
  
@@ -49,7 +50,7 @@ class AuthenticationTest extends TestCase
              'password' => 'wrong-password',
          ]);
  
-         $this->assertGuest();
+         $this->assertGuest('admin');
      }
  
      public function test_admins_can_logout(): void
@@ -60,8 +61,9 @@ class AuthenticationTest extends TestCase
          $admin->save();
  
          $response = $this->actingAs($admin, 'admin')->post('/admin/logout');
- 
-         $this->assertGuest();
+        
+         // 特定のガードが認証されていないことを確認
+         $this->assertGuest('admin');
          $response->assertRedirect('/');
      }
 }
