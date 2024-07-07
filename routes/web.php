@@ -1,9 +1,13 @@
 <?php
 
-use App\Http\Controllers\ProfileController;
+
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin;
+use App\Http\Controllers\Admin\RestaurantController;
+use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Admin\UserController;
+use App\Http\Controllers\HomeController;
+use App\Http\Controllers\RestaurantController as UR;
 
 /*
 |--------------------------------------------------------------------------
@@ -16,15 +20,26 @@ use App\Http\Controllers\Admin\UserController;
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
+
+require __DIR__ . '/auth.php';
+
+/*
+このようにRouteファサードのgroup()メソッドを使い、配列で'prefix'や'as'を指定することで、'prefix'の場合はURLの先頭、'as'の場合は名前付きルートの先頭を設定できます。
+
+つまり以下の例であれば、グループ内で設定しているルートのURLが'admin/home'、名前付きルートが'admin.home'となります。
+*/
+Route::group([
+    'prefix' => 'admin',
+    'as' => 'admin.',
+    'middleware' => 'auth:admin'
+], function () {
+    Route::get('home', [Admin\HomeController::class, 'index'])->name('home');
+    Route::get('users', [Admin\UserController::class, 'index'])->name('users.index');
+    // {user}の名称は show.blade.php 内で指定している $user を入れる
+    Route::get('users/{user}', [Admin\UserController::class, 'show'])->name('users.show');
+
+    Route::resource('restaurants', RestaurantController::class);
 });
-
-Route::get('/user', [UserController::class, 'index']);
-
-Route::get('/dashboard', function () {
-    return view('dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
@@ -37,8 +52,26 @@ Route::middleware('auth:admin')->group(function () {
     Route::get('admin/users/{user}', [App\Http\Controllers\Admin\UserController::class, 'show'])->name('admin.users.show');
 });
 
-require __DIR__.'/auth.php';
 
 Route::group(['prefix' => 'admin', 'as' => 'admin.', 'middleware' => 'auth:admin'], function () {
     Route::get('home', [Admin\HomeController::class, 'index'])->name('home');
+});
+
+Route::resource('restaurants', RestaurantController::class);
+
+
+// admin以外が通れる
+// ※guest:adminの挙動: adminはadmin.homeへリダイレクト、それ以外はOK。
+// Route::group(['middleware' => 'guest:admin'], function () {
+    Route::group(['middleware' => 'guest:admin'], function () {
+
+        Route::get('/restaurants', [UR::class, 'index'])->name('restaurants.index');
+        Route::get('/restaurants/{restaurant}', [UR::class, 'show'])->name('restaurants.show');
+    });
+
+// auth:web = WEB（ユーザー）として認証のみ
+Route::group(['middleware' => ['auth:web','verified']], function () {
+    Route::get('/user', [UserController::class, 'index'])->name('user.index');
+    Route::get('/user/{user}/edit', [UserController::class, 'edit'])->name('user.edit');
+    Route::patch('/user/{user}', [UserController::class, 'update'])->name('user.update');
 });
