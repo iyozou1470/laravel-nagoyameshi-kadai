@@ -20,10 +20,6 @@ class Restaurant extends Model
         'opening_time', 'closing_time', 'seating_capacity'
     ];
     // リレーションの定義
-    public function ratingSortable($query, $direction) {
-        return $query->withAvg('reviews', 'score')->orderBy('reviews_avg_score', $direction);
-    }
-
     public function favorited_users()
     {
         return $this->belongsToMany(User::class)->withTimestamps();
@@ -35,4 +31,7 @@ class Restaurant extends Model
     //    return $query->withAvg('reviews', 'score')->orderBy('reviews_avg_score', $direction);
     //}
 
+    //public function ratingSortable($query, $direction) {
+    //    return $query->withAvg('reviews', 'score')->orderBy('reviews_avg_score', $direction);
+    //}
 }
