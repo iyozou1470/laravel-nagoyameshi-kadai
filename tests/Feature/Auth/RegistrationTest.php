@@ -21,16 +21,17 @@ class RegistrationTest extends TestCase
     {
         $response = $this->post('/register', [
             'name' => 'Test User',
-            'kana' => 'テスト ユーザー',
+            'kana' => 'テストユーザー',
             'email' => 'test@example.com',
             'password' => 'password',
             'password_confirmation' => 'password',
-            'postal_code' => '0000000',
-             'address' => 'テスト',
-             'phone_number' => '00000000000',
+            'postal_code' => '1000001',
+            'address' => '福岡県1-1',
+            'phone_number' => '09010011001',
         ]);
 
         $this->assertAuthenticated();
-        $response->assertRedirect(RouteServiceProvider::HOME);
+        // メール認証が必要な場合のリダイレクト先を確認
+        $response->assertRedirect('/verify-email');
     }
 }
