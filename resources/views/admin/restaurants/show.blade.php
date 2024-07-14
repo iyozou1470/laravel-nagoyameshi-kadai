@@ -156,7 +156,7 @@
                         </div>
                     </div>
 
-                    {{--<div class="row pb-2 mb-2 border-bottom">
+                    <div class="row pb-2 mb-2 border-bottom">
                         <div class="col-2">
                             <span class="fw-bold">カテゴリ</span>
                         </div>
@@ -176,7 +176,7 @@
                                 <span>未設定</span>
                             @endif
                         </div>
-                    </div>--}}
+                    </div>
                 </div>
             </div>
         </div>

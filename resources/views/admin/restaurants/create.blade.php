@@ -168,7 +168,7 @@
                     </div>
 
                     @for ($i = 0; $i < 3; $i++)
-                        {{--<div class="form-group row mb-3">
+                        <div class="form-group row mb-3">
                             <label for="category{{ $i + 1 }}" class="col-md-5 col-form-label text-md-left fw-bold">カテゴリ{{ $i + 1 }}（3つまで選択可）</label>
 
                             <div class="col-md-7">
@@ -183,7 +183,7 @@
                                     @endforeach
                                 </select>
                             </div>
-                        </div>--}}
+                        </div>
                     @endfor
 
                     <hr class="my-4">
