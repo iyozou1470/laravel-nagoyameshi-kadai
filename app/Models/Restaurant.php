@@ -19,6 +19,12 @@ class Restaurant extends Model
         'highest_price', 'postal_code', 'address', 
         'opening_time', 'closing_time', 'seating_capacity'
     ];
+
+    public function categories()
+    {
+        return $this->belongsToMany(Category::class)->withTimestamps();
+    }
+    
     // リレーションの定義
     public function favorited_users()
     {
