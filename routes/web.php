@@ -4,6 +4,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin;
 use App\Http\Controllers\Admin\RestaurantController;
+use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\HomeController;
@@ -42,6 +43,7 @@ Route::group([
     Route::get('users/{user}', [Admin\UserController::class, 'show'])->name('users.show');
 
     Route::resource('restaurants', RestaurantController::class);
+    Route::resource('categories', CategoryController::class); // カテゴリ管理用のルートを追加
 });
 
 Route::middleware('auth')->group(function () {
@@ -67,7 +69,7 @@ Route::resource('restaurants', RestaurantController::class);
 // ※guest:adminの挙動: adminはadmin.homeへリダイレクト、それ以外はOK。
 // Route::group(['middleware' => 'guest:admin'], function () {
     Route::group(['middleware' => 'guest:admin'], function () {
-
+        
         Route::get('/restaurants', [UR::class, 'index'])->name('restaurants.index');
         Route::get('/restaurants/{restaurant}', [UR::class, 'show'])->name('restaurants.show');
     });
