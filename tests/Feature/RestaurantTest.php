@@ -7,54 +7,59 @@ use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
 use App\Models\User;
 use App\Models\Admin;
+use Illuminate\Support\Facades\Hash;
 use App\Models\Restaurant;
+use App\Models\Category;
 
 class RestaurantTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_guest_can_access_restaurant_index()
-    {
+    // 未ログインのユーザーは会員側の店舗一覧ページにアクセスできる
+    public function test_unauthenticated_user_can_access_member_store_page() {
         $response = $this->get(route('restaurants.index'));
         $response->assertStatus(200);
     }
 
-    public function test_user_can_access_restaurant_index()
-    {
+    // ログイン済みの一般ユーザーは会員側の店舗一覧ページにアクセスできる
+    public function test_authenticated_user_can_access_member_store_page(): void {
         $user = User::factory()->create();
-        $response = $this->actingAs($user, 'web')->get(route('restaurants.index'));
+        $response = $this->actingAs($user)->get(route('restaurants.index'));
         $response->assertStatus(200);
     }
 
-    public function test_admin_cannot_access_restaurant_index()
-    {
+    // ログイン済みの管理者は会員側の店舗一覧ページにアクセスできない
+    public function test_admin_cannot_access_member_store_page(): void {
         $admin = Admin::factory()->create();
+
         $response = $this->actingAs($admin, 'admin')->get(route('restaurants.index'));
-        $response->assertRedirect(route('admin.home'));
+        $response->assertStatus(302);
+        $response->assertRedirect('admin/home');
     }
 
-    // show
-    public function test_guest_can_access_restaurant_show()
-    {
+    // 未ログインのユーザーは会員側の店舗詳細ページにアクセスできる
+    public function test_unauthenticated_user_can_access_member_store_detail_page() {
         $restaurant = Restaurant::factory()->create();
-        $response = $this->get(route('restaurants.show',$restaurant));
+        $response = $this->get(route('restaurants.show', ['restaurant' => $restaurant]));
         $response->assertStatus(200);
     }
 
-    public function test_user_can_access_restaurant_show()
-    {
-        $restaurant = Restaurant::factory()->create();
+    // ログイン済みの一般ユーザーは会員側の店舗詳細ページにアクセスできる
+    public function test_authenticated_user_can_access_member_store_detail_page(): void {
         $user = User::factory()->create();
-        $response = $this->actingAs($user, 'web')->get(route('restaurants.show',$restaurant));
+        $restaurant = Restaurant::factory()->create();
+
+        $response = $this->actingAs($user)->get(route('restaurants.show', ['restaurant' => $restaurant]));
         $response->assertStatus(200);
     }
 
-    public function test_admin_cannot_access_restaurant_show()
-    {
-        $restaurant = Restaurant::factory()->create();
+    // ログイン済みの管理者は会員側の店舗詳細ページにアクセスできない
+    public function test_admin_cannot_access_member_store_detail_page(): void {
         $admin = Admin::factory()->create();
-        $response = $this->actingAs($admin, 'admin')->get(route('restaurants.show',$restaurant));
-        $response->assertRedirect(route('admin.home'));
-    }
+        $restaurant = Restaurant::factory()->create();
 
+        $response = $this->actingAs($admin, 'admin')->get(route('restaurants.show', ['restaurant' => $restaurant]));
+        $response->assertStatus(302);
+        $response->assertRedirect('admin/home');
+    }
 }

@@ -39,11 +39,12 @@ Route::group([
 ], function () {
     Route::get('home', [Admin\HomeController::class, 'index'])->name('home');
     Route::get('users', [Admin\UserController::class, 'index'])->name('users.index');
+    // {user}の名称は show.blade.php 内で指定している $user を入れる
     Route::get('users/{user}', [Admin\UserController::class, 'show'])->name('users.show');
+
     Route::resource('restaurants', RestaurantController::class);
     Route::resource('categories', CategoryController::class); // カテゴリ管理用のルートを追加
 });
-
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');

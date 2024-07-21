@@ -1,49 +1,40 @@
 @extends('layouts.app')
 
 @section('content')
-    <!-- 店舗の削除用モーダル -->
-    <div class="modal fade" id="deleteRestaurantModal" tabindex="-1" aria-labelledby="deleteRestaurantModalLabel">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="deleteRestaurantModalLabel">「{{ $restaurant->name }}」を削除してもよろしいですか？</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="閉じる"></button>
-                </div>
-                <div class="modal-footer">
-                    <form action="{{ route('admin.restaurants.destroy', $restaurant) }}" method="post">
-                        @csrf
-                        @method('delete')
-                        <button type="submit" class="btn text-white shadow-sm nagoyameshi-btn-danger">削除</button>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="col container">
+    <div class="container nagoyameshi-container pb-5">
         <div class="row justify-content-center">
-            <div class="col-xl-7 col-lg-8 col-md-9">
-                <nav class="mb-4" style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
+            <div class="col-xxl-6 col-xl-7 col-lg-8 col-md-10">
+                <nav class="my-3" style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
                     <ol class="breadcrumb mb-0">
-                        <li class="breadcrumb-item"><a href="{{ route('admin.restaurants.index') }}">店舗一覧</a></li>
+                        <li class="breadcrumb-item"><a href="{{ route('home') }}">ホーム</a></li>
+                        <li class="breadcrumb-item"><a href="{{ route('restaurants.index') }}">店舗一覧</a></li>
                         <li class="breadcrumb-item active" aria-current="page">店舗詳細</li>
                     </ol>
                 </nav>
 
-                <h1 class="mb-4 text-center">{{ $restaurant->name }}</h1>
-
-                <div class="d-flex justify-content-end align-items-end mb-3">
-                    <div>
-                        <a href="{{ route('admin.restaurants.edit', $restaurant) }}" class="me-2">編集</a>
-                        <a href="#" class="link-secondary" data-bs-toggle="modal" data-bs-target="#deleteRestaurantModal">削除</a>
-                    </div>
-                </div>
+                <h1 class="mb-2 text-center">{{ $restaurant->name }}</h1>
+                <p class="text-center">
+                    <span class="nagoyameshi-star-rating me-1" data-rate="{{ round($restaurant->reviews->avg('score') * 2) / 2 }}"></span>
+                    {{ number_format(round($restaurant->reviews->avg('score'), 2), 2) }}（{{ $restaurant->reviews->count() }}件）
+                </p>
 
                 @if (session('flash_message'))
                     <div class="alert alert-info" role="alert">
                         <p class="mb-0">{{ session('flash_message') }}</p>
                     </div>
                 @endif
+
+                <ul class="nav nav-tabs mb-2">
+                    <li class="nav-item">
+                        <a class="nav-link active text-white nagoyameshi-bg" aria-current="page" href="{{ route('restaurants.show', $restaurant) }}">トップ</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link link-dark" href="#">予約</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link link-dark" href="{{ route('restaurants.reviews.index', $restaurant) }}">レビュー</a>
+                    </li>
+                </ul>
 
                 <div class="mb-2">
                     @if ($restaurant->image !== '')
@@ -53,17 +44,7 @@
                     @endif
                 </div>
 
-                <div class="container mb-4">
-                    <div class="row pb-2 mb-2 border-bottom">
-                        <div class="col-2">
-                            <span class="fw-bold">ID</span>
-                        </div>
-
-                        <div class="col">
-                            <span>{{ $restaurant->id }}</span>
-                        </div>
-                    </div>
-
+                <div class="container">
                     <div class="row pb-2 mb-2 border-bottom">
                         <div class="col-2">
                             <span class="fw-bold">店舗名</span>
@@ -90,7 +71,7 @@
                         </div>
 
                         <div class="col">
-                            <span>{{ number_format($restaurant->lowest_price) . '～' . number_format($restaurant->highest_price) }}円</span>
+                            <span>{{ number_format($restaurant->lowest_price) }}円～{{ number_format($restaurant->highest_price) }}円</span>
                         </div>
                     </div>
 
@@ -126,6 +107,28 @@
 
                     <div class="row pb-2 mb-2 border-bottom">
                         <div class="col-2">
+                            <span class="fw-bold">定休日</span>
+                        </div>
+
+                        <div class="col d-flex">
+                            @if ($restaurant->regular_holidays()->exists())
+                                @foreach ($restaurant->regular_holidays()->orderBy('regular_holiday_id', 'asc')->get() as $index => $regular_holiday)
+                                    <div>
+                                        @if ($index === 0)
+                                            {{ $regular_holiday->day }}
+                                        @else
+                                            {{ '、' . $regular_holiday->day }}
+                                        @endif
+                                    </div>
+                                @endforeach
+                            @else
+                                <span>年中無休</span>
+                            @endif
+                        </div>
+                    </div>
+
+                    <div class="row pb-2 mb-2 border-bottom">
+                        <div class="col-2">
                             <span class="fw-bold">座席数</span>
                         </div>
 
@@ -134,7 +137,7 @@
                         </div>
                     </div>
 
-                    <div class="row pb-2 mb-2 border-bottom">
+                    <div class="row pb-2 mb-4 border-bottom">
                         <div class="col-2">
                             <span class="fw-bold">カテゴリ</span>
                         </div>

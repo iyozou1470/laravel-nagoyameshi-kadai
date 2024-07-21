@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use Kyslik\ColumnSortable\Sortable;
+//use Kyslik\ColumnSortable\Sortable;
 use App\Models\Restaurant;
 use App\Models\Category;
 
@@ -30,7 +30,7 @@ class RestaurantController extends Controller
         }
 
 
-        $restaurants = Restaurant::sortable($sort_query)->paginate(15);
+        //$restaurants = Restaurant::sortable($sort_query)->paginate(15);
 
         if ($keyword) {
             $restaurants = Restaurant::
@@ -39,19 +39,19 @@ class RestaurantController extends Controller
                 ->orWhereHas('categories', function ($query) use ($keyword) {
                     $query->where('categories.name', 'like', "%{$keyword}%");
                 })
-                ->sortable($sort_query)
+                //->sortable($sort_query)
                 ->paginate(15);
         } elseif ($category_id) {
             $restaurants = Restaurant::
                 WhereHas('categories', function ($query) use ($category_id) {
                     $query->where('categories.id', '=', "{$category_id}");
                 })
-                ->sortable($sort_query)
+                //->sortable($sort_query)
                 ->paginate(15);
         } elseif ($price) {
             $restaurants = Restaurant::
                 where("lowest_price", "<=", $price)
-                ->sortable($sort_query)
+                //->sortable($sort_query)
                 ->paginate(15);
         }
 
