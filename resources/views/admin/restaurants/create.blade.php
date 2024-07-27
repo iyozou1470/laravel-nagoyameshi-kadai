@@ -149,6 +149,14 @@
                     <div class="form-group row mb-3">
                         <label class="col-md-5 col-form-label text-md-left fw-bold">定休日</label>
 
+                        <div class="col-md-7 d-flex flex-wrap">
+                            @foreach ($regular_holidays as $index => $regular_holiday)
+                                <div class="form-check d-flex align-items-center me-3">
+                                    <input type="checkbox" class="form-check-input" id="regularHoliday{{ $index }}" name="regular_holiday_ids[]" value="{{ $regular_holiday->id }}">
+                                    <label class="form-check-label" for="regularHoliday{{ $index }}"><span class="badge bg-secondary ms-1">{{ $regular_holiday->day }}</span></label>
+                                </div>
+                            @endforeach
+                        </div>
                     </div>
 
                     <div class="form-group row mb-3">

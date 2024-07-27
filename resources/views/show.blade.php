@@ -121,7 +121,7 @@
                                         @endif
                                     </div>
                                 @endforeach
-                            @else
+                            @else--
                                 <span>年中無休</span>
                             @endif
                         </div>
