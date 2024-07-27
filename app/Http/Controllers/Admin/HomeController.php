@@ -31,7 +31,7 @@ class HomeController extends Controller
         }
 
 
-        // $highly_rated_restaurants = Restaurant::take(6)->get();
+         $highly_rated_restaurants = Restaurant::take(6)->get();
         $highly_rated_restaurants = Restaurant::withAvg('reviews', 'score')->orderBy('reviews_avg_score', 'desc')->take(6)->get();
 
         $categories = Category::all();
