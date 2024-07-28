@@ -20,13 +20,13 @@ class RestaurantController extends Controller
     {
         $keyword = $request->keyword;
 
-         if ($keyword !== null) {
+        if ($keyword !== null) {
             $restaurants = Restaurant::where('name', 'like', "%{$keyword}%")->paginate(15);
             $total = $restaurants->total();
-         } else {
+        } else {
             $restaurants = Restaurant::paginate(15);
             $total = Restaurant::all()->count();
-         }
+        }
 
         return view('admin.restaurants.index', compact('restaurants', 'total', 'keyword'));
     }
@@ -73,10 +73,10 @@ class RestaurantController extends Controller
         $restaurant->seating_capacity = $request->input('seating_capacity');
         $restaurant->save();
         
-        $regular_holiday_ids = array_filter($request->input('regular_holiday_ids'));
+        $regular_holiday_ids = array_filter($request->input('regular_holiday_ids', []));
         $restaurant->regular_holidays()->sync($regular_holiday_ids);
         
-        $category_ids = array_filter($request->input('category_ids'));
+        $category_ids = array_filter($request->input('category_ids', []));
         $restaurant->categories()->sync($category_ids);
 
         return redirect()->route('admin.restaurants.index', compact('restaurant'))->with('flash_message', '店舗を登録しました。');
@@ -121,7 +121,7 @@ class RestaurantController extends Controller
         $restaurant->opening_time = $request->input('opening_time');
         $restaurant->closing_time = $request->input('closing_time');
 
-        $regular_holiday_ids = array_filter($request->input('regular_holiday_ids'));
+        $regular_holiday_ids = array_filter($request->input('regular_holiday_ids', []));
         $restaurant->regular_holidays()->sync($regular_holiday_ids);
 
         $restaurant->seating_capacity = $request->input('seating_capacity');
@@ -133,17 +133,16 @@ class RestaurantController extends Controller
 
         $restaurant->update();
 
-        $category_ids = array_filter($request->input('category_ids'));
+        $category_ids = array_filter($request->input('category_ids', []));
         $restaurant->categories()->sync($category_ids);
 
         return redirect()->route('admin.restaurants.show', compact('restaurant'))->with('flash_message', '店舗を編集しました。');
-
     }
 
     public function destroy(Restaurant $restaurant)
     {
         $restaurant->delete();
 
-        return redirect()->route('admin.restaurants.index', compact('restaurant'))->with('flash_message', '店舗を削除しました。');
+        return redirect()->route('admin.restaurants.index')->with('flash_message', '店舗を削除しました。');
     }
 }
