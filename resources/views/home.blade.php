@@ -50,10 +50,9 @@
         </div>
     </div>
 
-    <div class="container nagoyameshi-container">
+    {{--<div class="container nagoyameshi-container">
         <h2 class="mb-3">評価が高いお店</h2>
-        <div class="row row-cols-xl-6 row-cols-md-3 row-cols-2 g-3 mb-5">
-            @foreach ($highly_rated_restaurants as $highly_rated_restaurant)
+        @foreach ($highly_rated_restaurants as $highly_rated_restaurant)
                 <div class="col">
                     <a href="{{ route('restaurants.show', $highly_rated_restaurant) }}" class="link-dark nagoyameshi-card-link">
                         <div class="card h-100">
@@ -168,7 +167,7 @@
             @endforeach
         </div>
 
-        <h2 class="mb-3">新規掲載店</h2>
+        {{--<h2 class="mb-3">新規掲載店</h2>
         <div class="row row-cols-xl-6 row-cols-md-3 row-cols-2 g-3 mb-5">
             @foreach ($new_restaurants as $new_restaurant)
                 <div class="col">
@@ -196,12 +195,12 @@
                                         <span>カテゴリ未設定</span>
                                     @endif
                                 </div>
-                                < class="card-text">{{ mb_substr($new_restaurant->description, 0, 19) }}@if (mb_strlen($new_restaurant->description) > 19)...@endif</p>
+                                <p class="card-text">{{ mb_substr($new_restaurant->description, 0, 19) }}@if (mb_strlen($new_restaurant->description) > 19)...@endif</p>
                             </div>
                         </div>
                     </a>
                 </div>
             @endforeach
-        </div>
+        </div>--}}
     </div>
 @endsection
