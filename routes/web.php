@@ -15,6 +15,7 @@ use App\Http\Controllers\RestaurantController as UR;
 // use App\Http\Controllers\FavoriteController;
 use App\Http\Controllers\CompanyController as User_Company_Cont;
 // use App\Http\Controllers\TermController as User_Term_Cont;
+use App\Http\Controllers\Admin\HomeController as AdminHomeController;
 
 /*
 |--------------------------------------------------------------------------
@@ -38,7 +39,7 @@ Route::group([
     'as' => 'admin.',
     'middleware' => 'auth:admin'
 ], function () {
-    Route::get('home', [Admin\HomeController::class, 'index'])->name('home');
+    Route::get('home', [AdminHomeController::class, 'index'])->name('home');
     Route::get('users', [Admin\UserController::class, 'index'])->name('users.index');
     Route::get('users/{user}', [Admin\UserController::class, 'show'])->name('users.show');
 
