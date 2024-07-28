@@ -36,6 +36,6 @@ class HomeController extends Controller
             ->take(6)
             ->get();
 
-        return view('home', compact('highly_rated_restaurants', 'categories', 'new_restaurants'));
+        return view('home', compact('categories'));
     }
 }
