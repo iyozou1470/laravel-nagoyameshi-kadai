@@ -36,7 +36,7 @@ class RestaurantController extends Controller
         $categories = Category::all();
         $regular_holidays = RegularHoliday::all();
 
-        return view('admin.restaurants.create', ['categories' => $categories], ['regular_holidays' => $regular_holidays]);
+        return view('admin.restaurants.create', compact('categories', 'regular_holidays'));
     }
 
     public function store(Request $request)
@@ -54,24 +54,20 @@ class RestaurantController extends Controller
             'seating_capacity' => 'required|numeric|min:0'
         ]);
 
-        $restaurant = new Restaurant();
-        $restaurant->name = $request->input('name');
-        if($request->hasFile('image')) {
-            $image = $request->file('image')->store('public/restaurants');
-            $restaurant->image_name = basename($image);
-        } else {
-            $restaurant->image = '';
-        }
-        $restaurant->description = $request->input('description');
-        $restaurant->lowest_price = $request->input('lowest_price');
-        $restaurant->highest_price = $request->input('highest_price');
-        $restaurant->postal_code = $request->input('postal_code');
-        $restaurant->address = $request->input('address');
-        $restaurant->opening_time = $request->input('opening_time');
-        $restaurant->closing_time = $request->input('closing_time');
+        $restaurantData = $request->only([
+            'name', 'description', 'lowest_price', 'highest_price', 
+            'postal_code', 'address', 'opening_time', 'closing_time', 
+            'seating_capacity'
+        ]);
 
-        $restaurant->seating_capacity = $request->input('seating_capacity');
-        $restaurant->save();
+        if ($request->hasFile('image')) {
+            $image = $request->file('image')->store('public/restaurants');
+            $restaurantData['image'] = basename($image);
+        } else {
+            $restaurantData['image'] = '';
+        }
+
+        $restaurant = Restaurant::create($restaurantData);
         
         $regular_holiday_ids = array_filter($request->input('regular_holiday_ids', []));
         $restaurant->regular_holidays()->sync($regular_holiday_ids);
@@ -79,7 +75,7 @@ class RestaurantController extends Controller
         $category_ids = array_filter($request->input('category_ids', []));
         $restaurant->categories()->sync($category_ids);
 
-        return redirect()->route('admin.restaurants.index', compact('restaurant'))->with('flash_message', '店舗を登録しました。');
+        return redirect()->route('admin.restaurants.index')->with('flash_message', '店舗を登録しました。');
     }
 
     public function show(Restaurant $restaurant)
@@ -91,7 +87,6 @@ class RestaurantController extends Controller
     {
         $categories = Category::all();
         $category_ids = $restaurant->categories->pluck('id')->toArray();
-
         $regular_holidays = RegularHoliday::all();
 
         return view('admin.restaurants.edit', compact('restaurant', 'category_ids', 'categories', 'regular_holidays'));
@@ -112,26 +107,19 @@ class RestaurantController extends Controller
             'seating_capacity' => 'required|numeric|min:0'
         ]);
 
-        $restaurant->name = $request->input('name');
-        $restaurant->description = $request->input('description');
-        $restaurant->lowest_price = $request->input('lowest_price');
-        $restaurant->highest_price = $request->input('highest_price');
-        $restaurant->postal_code = $request->input('postal_code');
-        $restaurant->address = $request->input('address');
-        $restaurant->opening_time = $request->input('opening_time');
-        $restaurant->closing_time = $request->input('closing_time');
+        $restaurant->update($request->only([
+            'name', 'description', 'lowest_price', 'highest_price', 
+            'postal_code', 'address', 'opening_time', 'closing_time', 
+            'seating_capacity'
+        ]));
 
-        $regular_holiday_ids = array_filter($request->input('regular_holiday_ids', []));
-        $restaurant->regular_holidays()->sync($regular_holiday_ids);
-
-        $restaurant->seating_capacity = $request->input('seating_capacity');
-
-        if($request->hasFile('image')) {
+        if ($request->hasFile('image')) {
             $image = $request->file('image')->store('public/restaurants');
             $restaurant->image = basename($image);
         }
 
-        $restaurant->update();
+        $regular_holiday_ids = array_filter($request->input('regular_holiday_ids', []));
+        $restaurant->regular_holidays()->sync($regular_holiday_ids);
 
         $category_ids = array_filter($request->input('category_ids', []));
         $restaurant->categories()->sync($category_ids);
