@@ -5,7 +5,7 @@ use App\Http\Controllers\Admin;
 use App\Http\Controllers\Admin\RestaurantController;
 use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\CompanyController;
-// use App\Http\Controllers\Admin\TermController;
+use App\Http\Controllers\Admin\TermController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\RestaurantController as UR;
@@ -44,16 +44,16 @@ Route::group([
 
     Route::resource('restaurants', RestaurantController::class);
     Route::resource('categories', CategoryController::class);
-    // Route::resource('company', CompanyController::class);
-    // Route::resource('terms', TermController::class);
+    Route::resource('company', CompanyController::class);
+    Route::resource('terms', TermController::class);
 });
 
 Route::group(['middleware' => 'guest:admin'], function () {
     Route::get('/', [HomeController::class, 'index'])->name('home');
     Route::get('/restaurants', [UR::class, 'index'])->name('restaurants.index');
     Route::get('/restaurants/{restaurant}', [UR::class, 'show'])->name('restaurants.show');
-    // Route::get('/company', [User_Company_Cont::class, 'index'])->name('company.index');
-    // Route::get('/terms', [User_Term_Cont::class, 'index'])->name('terms.index');
+    Route::get('/company', [User_Company_Cont::class, 'index'])->name('company.index');
+    Route::get('/terms', [User_Term_Cont::class, 'index'])->name('terms.index');
 });
 
 Route::group(['middleware' => ['auth:web','verified']], function () {
