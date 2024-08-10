@@ -14,7 +14,7 @@ use App\Http\Controllers\RestaurantController as UR;
 // use App\Http\Controllers\ReservationController;
 // use App\Http\Controllers\FavoriteController;
 use App\Http\Controllers\CompanyController as User_Company_Cont;
-// use App\Http\Controllers\TermController as User_Term_Cont;
+use App\Http\Controllers\TermController as User_Term_Cont;
 
 /*
 |--------------------------------------------------------------------------
@@ -62,7 +62,7 @@ Route::group(['middleware' => ['auth:web','verified']], function () {
     Route::patch('/user/{user}', [UserController::class, 'update'])->name('user.update');
 
     // レビュー機能のうち一般ユーザー向け
-    // Route::get('/restaurants/{restaurant}/reviews', [ReviewController::class, 'index'])->name('restaurants.reviews.index');
+    //Route::get('/restaurants/{restaurant}/reviews', [ReviewController::class, 'index'])->name('restaurants.reviews.index');
 
     // サブスクなし
     // Route::group(['middleware' => 'not_subscribed'], function () {

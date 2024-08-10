@@ -2,14 +2,12 @@
 
 namespace App\Http\Controllers;
 
-// 検証中
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
 use App\Models\User;
-
-use Illuminate\Http\Request;
 use App\Models\Restaurant;
 use App\Models\Category;
+use Illuminate\Http\Request;
 
 class HomeController extends Controller
 {
@@ -25,10 +23,21 @@ class HomeController extends Controller
         }
 
         // 最高評価のレストランを取得
-        //$highly_rated_restaurants = Restaurant::withAvg('reviews', 'score')
-            //->orderBy('reviews_avg_score', 'desc')
-            //->take(6)
-            //->get();
+        $highly_rated_restaurants = Restaurant::selectRaw('restaurants.*')
+        ->groupBy('restaurants.id')
+        ->orderBy('id', 'desc')
+        ->take(6)
+        ->get();
+
+
+        // reviews削除前
+        //$highly_rated_restaurants = Restaurant::with('[reviews]')
+        //   ->selectRaw('restaurants.*, AVG(reviews.score) as reviews_avg_score')
+        //    ->leftJoin('reviews', 'restaurants.id', '=', 'reviews.restaurant_id')
+        //    ->groupBy('restaurants.id')
+        //    ->orderBy('reviews_avg_score', 'desc')
+        //    ->take(6)
+        //    ->get();
 
         // カテゴリと新しいレストランを取得
         $categories = Category::all();
@@ -36,6 +45,6 @@ class HomeController extends Controller
             ->take(6)
             ->get();
 
-        return view('home', compact('categories'));
+        return view('home', compact('highly_rated_restaurants', 'new_restaurants', 'categories'));
     }
 }

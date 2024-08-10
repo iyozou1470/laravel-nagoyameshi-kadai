@@ -20,10 +20,14 @@ class HomeController extends Controller
             Log::info(" class: " . get_class() . ", guard: それ以外");
         }
 
-        //$highly_rated_restaurants = Restaurant::withAvg('reviews', 'score')->orderBy('reviews_avg_score', 'desc')->take(6)->get();
+        $highly_rated_restaurants = Restaurant::orderBy('created_at', 'desc')->take(6)->get();
         $categories = Category::all();
         $new_restaurants = Restaurant::orderBy("created_at", "desc")->take(6)->get();
 
-        return view('admin.home', compact('categories'));
+        //$highly_rated_restaurants = Restaurant::withAvg('reviews', 'score')->orderBy('reviews_avg_score', 'desc')->take(6)->get();
+        //$categories = Category::all();
+        //$new_restaurants = Restaurant::orderBy("created_at", "desc")->take(6)->get();
+
+        return view('admin.home', compact('categories', 'highly_rated_restaurants', 'new_restaurants'));
     }
 }
