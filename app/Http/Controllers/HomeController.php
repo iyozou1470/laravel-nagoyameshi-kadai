@@ -23,11 +23,12 @@ class HomeController extends Controller
         }
 
         // 最高評価のレストランを取得
-        $highly_rated_restaurants = Restaurant::selectRaw('restaurants.*')
-        ->groupBy('restaurants.id')
+        $highly_rated_restaurants = Restaurant::select('restaurants.id', 'restaurants.name', 'restaurants.created_at')
+        ->groupBy('restaurants.id', 'restaurants.name', 'restaurants.created_at')
         ->orderBy('id', 'desc')
         ->take(6)
         ->get();
+    
 
 
         // reviews削除前
