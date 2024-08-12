@@ -2,21 +2,22 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
- use App\Models\Admin;
- use Illuminate\Support\Facades\Hash;
+use App\Models\Admin;
 
 class Admin2Seeder extends Seeder
 {
     /**
      * Run the database seeds.
+     *
+     * @return void
      */
-    public function run(): void
+    public function run()
     {
-         $admin = new Admin();
-         $admin->email = 'admin2@example.com';
-         $admin->password = Hash::make('admin2');
-         $admin->save();
+        Admin::create([
+            'name' => 'Admin2',
+            'email' => 'admin2@example.com',
+            'password' => bcrypt('admin2'), // 適切なパスワードを設定
+        ]);
     }
 }
