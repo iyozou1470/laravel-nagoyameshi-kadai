@@ -14,11 +14,11 @@ class UserController extends Controller
     public function index()
     {
         // 検証中 サブスクチェック
-        if (Auth::user()->subscribed('premium_plan')) {
-            Log::debug("サブスクあり");
-        } else {
-            Log::debug("サブスクなし");
-        }
+        //if (Auth::user()->subscribed('premium_plan')) {
+        //    Log::debug("サブスクあり");
+        //} else {
+        //    Log::debug("サブスクなし");
+        //}
 
         $user = Auth::user();
 

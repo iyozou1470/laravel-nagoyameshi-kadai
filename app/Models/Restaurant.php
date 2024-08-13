@@ -15,6 +15,13 @@ class Restaurant extends Model
 {
     use HasFactory;//, Sortable;
 
+    // ここにfillableプロパティを追加
+    protected $fillable = [
+        'name', 'description', 'lowest_price', 'highest_price',
+        'postal_code', 'address', 'opening_time', 'closing_time',
+        'seating_capacity', 'image'
+    ];
+
     public function categories()
     {
         return $this->belongsToMany(Category::class)->withTimestamps();
