@@ -3,385 +3,287 @@
 namespace Tests\Feature\Admin;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
 use App\Models\User;
 use App\Models\Admin;
 use App\Models\Restaurant;
 use App\Models\Category;
 use App\Models\RegularHoliday;
-use Illuminate\Support\Facades\Hash;
 
 class RestaurantTest extends TestCase
 {
     use RefreshDatabase;
 
+    /*
+    indexアクション（店舗詳細ページ） 未ログイン、ログイン済かつ非管理者、管理者
+    showアクション（店舗詳細ページ） 未ログイン、ログイン済かつ非管理者、管理者
+    createアクション（店舗詳細ページ） 未ログイン、ログイン済かつ非管理者、管理者
+    storeアクション（店舗詳細ページ） 未ログイン、ログイン済かつ非管理者、管理者
+    editアクション（店舗詳細ページ） 未ログイン、ログイン済かつ非管理者、管理者
+    updateアクション（店舗詳細ページ） 未ログイン、ログイン済かつ非管理者、管理者
+    destroyアクション（店舗詳細ページ） 未ログイン、ログイン済かつ非管理者、管理者
+    */
 
-    // 未ログインのユーザーは管理者側の店舗一覧ページにアクセスできない
-    public function test_unauthenticated_user_cannot_access_admin_restaurant_list_page(): void 
+    // index
+    public function test_guest_cannot_access_restaurant_index()
     {
-        $response = $this->get(route('admin.restaurants.index'));
-
-        $response->assertRedirect(route('admin.login'));
+        $response = $this->get(route("admin.restaurants.index"));
+        $response->assertRedirect(route("admin.login"));
     }
-    
-    //未認証ユーザーがアクセスできない
-    public function test_unauthenticated_user_cannot_access_member_store_page(): void
-{
-    $response = $this->get(route('restaurants.index'));
 
-    $response->assertStatus(302); // 302 リダイレクトを確認
-    $response->assertRedirect(route('login')); // ログインページへのリダイレクトを確認
-}
-
-
-    // ログイン済みの一般ユーザーは管理者側の店舗一覧ページにアクセスできない
-    public function test_authenticated_regular_user_cannot_access_admin_restaurant_list_page(): void
+    public function test_user_cannot_access_restaurant_index()
     {
         $user = User::factory()->create();
-
-        $response = $this->actingAs($user)->get(route('admin.restaurants.index'));
-
-        $response->assertRedirect(route('admin.login'));
+        $response = $this->actingAs($user, 'web')->get(route('admin.restaurants.index'));
+        $response->assertRedirect(route("admin.login"));
     }
 
-    // ログイン済みの管理者は管理者側の店舗一覧ページにアクセスできる
-    public function test_authenticated_admin_can_access_admin_restaurant_list_page(): void
+    public function test_admin_can_access_restaurant_index()
     {
         $admin = Admin::factory()->create();
-
-        $restaurant = Restaurant::factory()->create();
-    
-        // 管理者としてログイン
-        $this->actingAs($admin, 'admin');
-    
-        // 店舗の一覧ページにアクセス
-        $response = $this->get(route('admin.restaurants.index'));
-    
-        // 正常にアクセスできることを確認
+        $response = $this->actingAs($admin, 'admin')->get(route('admin.restaurants.index'));
         $response->assertStatus(200);
     }
 
-    // 未ログインのユーザーは管理者側の店舗詳細ページにアクセスできない
-    public function test_unauthenticated_user_cannot_access_admin_restaurant_detail_page(): void
+    // show
+    public function test_guest_cannot_access_restaurant_show()
     {
         $restaurant = Restaurant::factory()->create();
-
-        $response = $this->get(route('admin.restaurants.show', ['restaurant' => $restaurant]));
-
-        $response->assertRedirect(route('admin.login'));
+        $response = $this->get(route("admin.restaurants.show", $restaurant));
+        $response->assertRedirect(route("admin.login"));
     }
 
-    // ログイン済みの一般ユーザーは管理者側の店舗詳細ページにアクセスできない
-    public function test_authenticated_regular_user_cannot_access_admin_restaurant_detail_page(): void
+    public function test_user_cannot_access_restaurant_show()
     {
         $user = User::factory()->create();
         $restaurant = Restaurant::factory()->create();
-
-        $response = $this->actingAs($user)->get(route('admin.restaurants.show', ['restaurant' => $restaurant]));
-
-        $response->assertRedirect(route('admin.login'));
+        $response = $this->actingAs($user, 'web')->get(route('admin.restaurants.show', $restaurant));
+        $response->assertRedirect(route("admin.login"));
     }
 
-    // ログイン済みの管理者は管理者側の店舗詳細ページにアクセスできる
-    public function test_authenticated_admin_can_access_admin_restaurant_detail_page(): void
+    public function test_admin_can_access_restaurant_show()
     {
         $admin = Admin::factory()->create();
         $restaurant = Restaurant::factory()->create();
-    
-        // 管理者としてログイン
-        $this->actingAs($admin, 'admin');
-    
-        // 店舗の詳細ページにアクセス
-        $response = $this->get(route('admin.restaurants.show', ['restaurant' => $restaurant]));
-    
-        // 正常にアクセスできることを確認
+        $response = $this->actingAs($admin, 'admin')->get(route('admin.restaurants.show', $restaurant));
         $response->assertStatus(200);
     }
 
-    // 未ログインのユーザーは管理者側の店舗登録ページにアクセスできない
-    public function test_unauthenticated_user_cannot_access_admin_restaurant_register_page(): void 
+    // create
+    public function test_guest_cannot_access_restaurant_create()
     {
-        $response = $this->get(route('admin.restaurants.create'));
-
-        $response->assertRedirect(route('admin.login'));
+        $response = $this->get(route("admin.restaurants.create"));
+        $response->assertRedirect(route("admin.login"));
     }
 
-    // ログイン済みの一般ユーザーは管理者側の店舗登録ページにアクセスできない
-    public function test_authenticated_regular_user_cannot_access_admin_restaurant_register_page(): void
+    public function test_user_cannot_access_restaurant_create()
     {
         $user = User::factory()->create();
-
-        $response = $this->actingAs($user)->get(route('admin.restaurants.create'));
-
-        $response->assertRedirect(route('admin.login'));
+        $response = $this->actingAs($user, 'web')->get(route('admin.restaurants.create'));
+        $response->assertRedirect(route("admin.login"));
     }
 
-    // ログイン済みの管理者は管理者側の店舗登録ページにアクセスできる
-    public function test_authenticated_admin_can_access_admin_restaurant_register_page(): void
+    public function test_admin_can_access_restaurant_create()
     {
         $admin = Admin::factory()->create();
-
-        // 管理者としてログイン
-        $this->actingAs($admin, 'admin');
-    
-        // 店舗登録ページにアクセス
-        $response = $this->get(route('admin.restaurants.create'));
-    
-        // 正常にアクセスできることを確認
+        $response = $this->actingAs($admin, 'admin')->get(route('admin.restaurants.create'));
         $response->assertStatus(200);
     }
 
-    // 未ログインのユーザーは店舗を登録できない
-    public function test_unauthenticated_user_cannot_register_restaurant(): void
+    // store
+    public function test_guest_cannot_store_restaurant()
     {
-        $dayOff = RegularHoliday::factory()->create();
-
-        $categoryIds = [];
-        for ($i = 1; $i <= 3; $i++) {
-            $category = Category::create([
-                'name' => 'カテゴリ' . $i
-            ]);
-            array_push($categoryIds, $category->id);    
-        }
-
         $restaurant = [
-            'name' => 'テスト',
-            'description' => 'テスト',
-            'lowest_price' => 1000,
-            'highest_price' => 5000,
-            'postal_code' => '0000000',
-            'address' => 'テスト',
-            'opening_time' => '10:00:00',
-            'closing_time' => '20:00:00',
-            'regular_holiday_ids' => [$dayOff->id],
-            'seating_capacity' => 50,
-            'category_ids' => $categoryIds,
+            'name' => 'あ',
+            // 'image' => '',
+            'description' => 'あ',
+            'lowest_price' => '100',
+            'highest_price' => '10000',
+            'postal_code' => '1234567',
+            'address' => '東京1',
+            'opening_time' => '10:00;00',
+            'closing_time' => '19:00:00',
+            'seating_capacity' => '50',
         ];
-
-        $response = $this->post(route('admin.restaurants.store'), $restaurant);
-
-        $response->assertRedirect(route('admin.login'));
+        $response = $this->post(route('admin.restaurants.store', $restaurant));
+        $this->assertDatabaseMissing('restaurants', $restaurant);
+        $response->assertRedirect(route("admin.login"));
     }
-
-    // ログイン済みの一般ユーザーは店舗を登録できない
-    public function test_authenticated_regular_user_cannot_register_restaurant(): void
+    public function test_user_cannot_store_restaurant()
     {
         $user = User::factory()->create();
-        $this->actingAs($user);
-
-        $dayOff = RegularHoliday::factory()->create();
-
-        $categoryIds = [];
-        for ($i = 1; $i <= 3; $i++) {
-            $category = Category::create([
-                'name' => 'カテゴリ' . $i
-            ]);
-            array_push($categoryIds, $category->id);    
-        }
-
         $restaurant = [
-            'name' => 'テスト',
-            'description' => 'テスト',
-            'lowest_price' => 1000,
-            'highest_price' => 5000,
-            'postal_code' => '0000000',
-            'address' => 'テスト',
-            'opening_time' => '10:00:00',
-            'closing_time' => '20:00:00',
-            'regular_holiday_ids' => [$dayOff->id],
-            'seating_capacity' => 50,
-            'category_ids' => $categoryIds,
+            'name' => 'あ',
+            // 'image' => '',
+            'description' => 'あ',
+            'lowest_price' => '100',
+            'highest_price' => '10000',
+            'postal_code' => '1234567',
+            'address' => '東京1',
+            'opening_time' => '10:00;00',
+            'closing_time' => '19:00:00',
+            'seating_capacity' => '50',
         ];
-
-        $response = $this->post(route('admin.restaurants.store'), $restaurant);
-
-        $response->assertRedirect(route('admin.login'));
+        $response = $this->actingAs($user, 'web')->post(route('admin.restaurants.store', $restaurant));
+        $this->assertDatabaseMissing('restaurants', $restaurant);
+        $response->assertRedirect(route("admin.login"));
     }
-
-    // ログイン済みの管理者は店舗を登録できる
-    public function test_authenticated_admin_can_register_restaurant(): void
+    public function test_admin_can_store_restaurant()
     {
         $admin = Admin::factory()->create();
-        $this->actingAs($admin, 'admin');
+        $categories_array = Category::factory()->count(3)->create()->pluck('id')->toArray();
+        $regular_holidays_array = RegularHoliday::factory()->count(3)->create()->pluck('id')->toArray();
 
-        $categoryIds = [];
-        for ($i = 1; $i <= 3; $i++) {
-            $category = Category::create([
-                'name' => 'カテゴリ' . $i
-            ]);
-            array_push($categoryIds, $category->id);    
-        }
-
-        $dayOff = RegularHoliday::factory()->create();
-
-        $restaurant = [
-            'name' => 'テスト',
-            'description' => 'テスト',
-            'lowest_price' => 1000,
-            'highest_price' => 5000,
-            'postal_code' => '0000000',
-            'address' => 'テスト',
+        $restaurant_data = [
+            'name' => 'あ',
+            // 'image' => '',
+            'description' => 'あ',
+            'lowest_price' => '100',
+            'highest_price' => '10000',
+            'postal_code' => '1234567',
+            'address' => '東京1',
             'opening_time' => '10:00:00',
-            'closing_time' => '20:00:00',
-            'regular_holiday_ids' => [$dayOff->id],
-            'seating_capacity' => 50,
-            'category_ids' => $categoryIds,
+            'closing_time' => '19:00:00',
+            'seating_capacity' => '50',
+            'category_ids' => $categories_array,
+            'regular_holiday_ids' => $regular_holidays_array,
         ];
+        $response = $this->actingAs($admin, 'admin')->post(route('admin.restaurants.store', $restaurant_data));
 
-        $response = $this->post(route('admin.restaurants.store'), $restaurant);
-
-        unset($restaurant['regular_holiday_ids'], $restaurant['category_ids']);
-        $this->assertDatabaseHas('restaurants', $restaurant);
+        $this->assertDatabaseHas('category_restaurant', ['category_id' => $categories_array[0]]);
+        unset($restaurant_data['category_ids']) ;
+        $this->assertDatabaseHas('regular_holiday_restaurant', ['regular_holiday_id' => $regular_holidays_array[0]]);
+        unset($restaurant_data['regular_holiday_ids']) ;
         
+        $this->assertDatabaseHas('restaurants', $restaurant_data);
+
         $response->assertRedirect(route('admin.restaurants.index'));
     }
 
-    // 未ログインのユーザーは管理者側の店舗編集ページにアクセスできない
-    public function test_unauthenticated_user_cannot_access_admin_restaurant_edit_page(): void 
+    // edit
+    public function test_guest_cannot_access_restaurant_edit()
     {
         $restaurant = Restaurant::factory()->create();
-
-        $response = $this->get(route('admin.restaurants.edit', ['restaurant' => $restaurant]));
-
-        $response->assertRedirect(route('admin.login'));
+        $response = $this->get(route("admin.restaurants.edit", $restaurant));
+        $response->assertRedirect(route("admin.login"));
     }
-
-    // ログイン済みの一般ユーザーは管理者側の店舗編集ページにアクセスできない
-    public function test_authenticated_regular_user_cannot_access_admin_restaurant_edit_page(): void
+    public function test_user_cannot_access_restaurant_edit()
     {
         $user = User::factory()->create();
         $restaurant = Restaurant::factory()->create();
-
-        $response = $this->actingAs($user)->get(route('admin.restaurants.edit', ['restaurant' => $restaurant]));
-
-        $response->assertRedirect(route('admin.login'));
+        $response = $this->actingAs($user, 'web')->get(route('admin.restaurants.edit', $restaurant));
+        $response->assertRedirect(route("admin.login"));
     }
 
-    // ログイン済みの管理者は管理者側の店舗編集ページにアクセスできる
-    public function test_authenticated_admin_can_access_admin_restaurant_edit_page(): void
+    public function test_admin_can_access_restaurant_edit()
     {
         $admin = Admin::factory()->create();
         $restaurant = Restaurant::factory()->create();
-    
-        // 管理者としてログイン
-        $this->actingAs($admin, 'admin');
-    
-        // 店舗編集ページにアクセス
-        $response = $this->get(route('admin.restaurants.edit', ['restaurant' => $restaurant]));
-    
-        // 正常にアクセスできることを確認
+        $response = $this->actingAs($admin, 'admin')->get(route('admin.restaurants.edit', $restaurant));
         $response->assertStatus(200);
     }
 
-    // 未ログインのユーザーは店舗を編集できない
-    public function test_unauthenticated_user_cannot_edit_restaurant(): void
+    // update
+    public function test_guest_cannot_update_restaurant()
     {
-        $restaurant = Restaurant::factory()->create();
-
-        $data = [
-            'name' => '更新テスト',
-            'description' => '更新テスト',
-            'lowest_price' => 2000,
-            'highest_price' => 6000,
-            'postal_code' => '1111111',
-            'address' => '更新テスト',
-            'opening_time' => '11:00:00',
-            'closing_time' => '21:00:00',
-            'seating_capacity' => 60,
+        $old_restaurant = Restaurant::factory()->create();
+        $new_restaurant = [
+            'name' => 'あ',
+            // 'image' => '',
+            'description' => 'あ',
+            'lowest_price' => '100',
+            'highest_price' => '10000',
+            'postal_code' => '1234567',
+            'address' => '東京1',
+            'opening_time' => '10:00:00',
+            'closing_time' => '19:00:00',
+            'seating_capacity' => '50',
         ];
-
-        $response = $this->put(route('admin.restaurants.update', ['restaurant' => $restaurant]), $data);
-
+        $response = $this->patch(route('admin.restaurants.update', $old_restaurant), $new_restaurant);
+        $this->assertDatabaseMissing('restaurants', $new_restaurant);
         $response->assertRedirect(route('admin.login'));
     }
-
-    // ログイン済みの一般ユーザーは店舗を編集できない
-    public function test_authenticated_regular_user_cannot_edit_restaurant(): void
+    public function test_user_cannot_update_restaurant()
     {
         $user = User::factory()->create();
-        $this->actingAs($user);
-
-        $restaurant = Restaurant::factory()->create();
-
-        $data = [
-            'name' => '更新テスト',
-            'description' => '更新テスト',
-            'lowest_price' => 2000,
-            'highest_price' => 6000,
-            'postal_code' => '1111111',
-            'address' => '更新テスト',
-            'opening_time' => '11:00:00',
-            'closing_time' => '21:00:00',
-            'seating_capacity' => 60,
+        $old_restaurant = Restaurant::factory()->create();
+        $new_restaurant = [
+            'name' => 'あ',
+            // 'image' => '',
+            'description' => 'あ',
+            'lowest_price' => '100',
+            'highest_price' => '10000',
+            'postal_code' => '1234567',
+            'address' => '東京1',
+            'opening_time' => '10:00:00',
+            'closing_time' => '19:00:00',
+            'seating_capacity' => '50',
         ];
-
-        $response = $this->put(route('admin.restaurants.update', ['restaurant' => $restaurant]), $data);
-
+        $response = $this->actingAs($user, 'web')->patch(route('admin.restaurants.update', $old_restaurant), $new_restaurant);
+        $this->assertDatabaseMissing('restaurants', $new_restaurant);
         $response->assertRedirect(route('admin.login'));
     }
-
-    // ログイン済みの管理者は店舗を編集できる
-    public function test_authenticated_admin_can_edit_restaurant(): void
+    public function test_admin_can_update_restaurant()
     {
         $admin = Admin::factory()->create();
-        $this->actingAs($admin, 'admin');
-        $restaurant = Restaurant::factory()->create();
+        $categories_array = Category::factory()->count(3)->create()->pluck('id')->toArray();
+        $regular_holidays_array = RegularHoliday::factory()->count(3)->create()->pluck('id')->toArray();
 
-        $data = [
-            'name' => '更新テスト',
-            'description' => '更新テスト',
-            'lowest_price' => 2000,
-            'highest_price' => 6000,
-            'postal_code' => '1111111',
-            'address' => '更新テスト',
-            'opening_time' => '11:00:00',
-            'closing_time' => '21:00:00',
-            'seating_capacity' => 60,
+        $old_restaurant = Restaurant::factory()->create();
+        $new_restaurant = [
+            'name' => 'あ',
+            // 'image' => '',
+            'description' => 'あ',
+            'lowest_price' => '100',
+            'highest_price' => '10000',
+            'postal_code' => '1234567',
+            'address' => '東京1',
+            'opening_time' => '10:00:00',
+            'closing_time' => '19:00:00',
+            'seating_capacity' => '50',
+            'category_ids' => $categories_array,
+            'regular_holiday_ids' => $regular_holidays_array,
         ];
+        $response = $this->actingAs($admin, 'admin')->patch(route('admin.restaurants.update', $old_restaurant), $new_restaurant);
 
-        $response = $this->put(route('admin.restaurants.update', ['restaurant' => $restaurant]), $data);
+        $this->assertDatabaseHas('regular_holiday_restaurant', ['regular_holiday_id' => $regular_holidays_array[0]]);
+        unset($new_restaurant['category_ids']) ;
+        $this->assertDatabaseHas('category_restaurant', ['category_id' => $categories_array[0]]);
+        unset($new_restaurant['regular_holiday_ids']) ;        
 
-        unset($data['category_ids']);
-        $this->assertDatabaseHas('restaurants', $data);
-        
-        $response->assertRedirect(route('admin.restaurants.show', ['restaurant' => $restaurant]));
+        $this->assertDatabaseHas('restaurants', $new_restaurant);
+
+        $response->assertRedirect(route('admin.restaurants.index'));
     }
 
-    // 未ログインのユーザーは店舗を削除できない
-    public function test_unauthenticated_user_cannot_delete_restaurant(): void
+
+    // destroy
+    public function test_guest_cannot_destroy_restaurant()
     {
         $restaurant = Restaurant::factory()->create();
-
-        $response = $this->delete(route('admin.restaurants.destroy', ['restaurant' => $restaurant]));
-
-        $response->assertRedirect(route('admin.login'));
+        $response = $this->delete(route("admin.restaurants.destroy", $restaurant));
+        $this->assertModelExists($restaurant);
+        $response->assertRedirect(route("admin.login"));
     }
-
-    // ログイン済みの一般ユーザーは店舗を削除できない
-    public function test_authenticated_regular_user_cannot_delete_restaurant(): void
+    public function test_user_cannot_destroy_restaurant()
     {
         $user = User::factory()->create();
-        $this->actingAs($user);
-
         $restaurant = Restaurant::factory()->create();
-
-        $response = $this->delete(route('admin.restaurants.destroy', ['restaurant' => $restaurant]));
-
-        $response->assertRedirect(route('admin.login'));
+        $response = $this->actingAs($user, 'web')->delete(route("admin.restaurants.destroy", $restaurant));
+        $this->assertModelExists($restaurant);
+        $response->assertRedirect(route("admin.login"));
+    }
+    public function test_admin_can_destroy_restaurant()
+    {
+        $admin = Admin::factory()->create();
+        $restaurant = Restaurant::factory()->create();
+        $response = $this->actingAs($admin, 'admin')->delete(route("admin.restaurants.destroy", $restaurant));
+        $this->assertModelMissing($restaurant);
+        $response->assertRedirect(route('admin.restaurants.index'));
     }
 
-    // ログイン済みの管理者は店舗を削除できる
-    public function test_authenticated_admin_can_delete_restaurant(): void
-{
-    $admin = Admin::factory()->create();
-    $this->actingAs($admin, 'admin');
-    $restaurant = Restaurant::factory()->create();
+    // カテゴリを追加できる
 
-    $response = $this->delete(route('admin.restaurants.destroy', ['restaurant' => $restaurant]));
 
-    // レストランがソフトデリートされたことを確認
-    $this->assertSoftDeleted('restaurants', ['id' => $restaurant->id]);
-    
-    $response->assertRedirect(route('admin.restaurants.index'));
-}
 }
