@@ -2,52 +2,37 @@
 
 namespace Tests\Feature\Admin;
 
-use App\Models\User;
-use App\Models\Admin;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
+use App\Models\User;
+use App\Models\Admin;
 use Illuminate\Support\Facades\Hash;
 
 class UserTest extends TestCase
 {
     use RefreshDatabase;
-    
-    /**
-     * A basic feature test example.
-     */
-    public function test_未ログインユーザー→管理者会員一覧NG(): void
+
+    //未ログインのユーザーは管理者側の会員一覧ページにアクセスできない
+    public function test_unauthenticated_user_cannnot_access_admin_list_page(): void 
     {
-        $response = $this->get('admin/index');
+        $response = $this->get('admin.users.index');
 
         $response->assertStatus(404);
     }
 
-
-    public function test_ログイン済みユーザー→管理者会員一覧NG(): void
+    //ログイン済みの一般ユーザーは管理者側の会員一覧ページにアクセスできない
+    public function test_authenticated_regular_user_cannot_access_admin_member_list_page(): void
     {
-        $user = new User();
-        $user->name = "testsan";
-        $user->kana = "テストサン";
-        $user->email = "user@example.com";
-        $user->password = Hash::make('nagoyameshi');
-        $user->postal_code = "123-4567";
-        $user->address = "aaa";
-        $user->phone_number = "090-1111-1111";
-        $user->birthday = "1990-01-01";
-        $user->occupation = "無職";
-        $user->save();
-     
-        $response = $this->post('/admin/login', [
-            'email' => $user->email,
-            'password' => 'nagoyameshi',
-        ]);
+        $user = User::factory()->create();
 
-        $response->assertRedirect('/');
+        $response = $this->actingAs($user)->get('admin.users.index');
+
+        $response->assertStatus(404);
     }
 
-
-    public function test_管理者ユーザー→管理者会員一覧OK(): void
+    //ログイン済みの管理者は管理者側の会員一覧ページにアクセスできる
+    public function test_authenticated_admin_can_access_admin_member_list_page(): void
     {
         $admin = new Admin();
         $admin->email = 'admin@example.com';
@@ -59,5 +44,42 @@ class UserTest extends TestCase
             'password' => 'nagoyameshi',
         ]);
         $response->assertRedirect(route('admin.home'));
+    }
+    //未ログインのユーザーは管理者側の会員詳細ページにアクセスできない
+    public function test_unauthenticated_user_cannnot_access_admin_detail_page(): void
+    {
+        $response = $this->get('admin.users.show');
+
+        $response->assertStatus(404);
+    }
+
+    //ログイン済みの一般ユーザーは管理者側の会員詳細ページにアクセスできない
+    public function test_authenticated_regular_user_cannot_access_admin_member_detail_page(): void
+    {
+        $user = User::factory()->create();
+
+        $response = $this->actingAs($user)->get('admin.users.show');
+
+        $response->assertStatus(404);
+    }
+
+    //ログイン済みの管理者は管理者側の会員詳細ページにアクセスできる
+    public function test_authenticated_admin_can_access_admin_member_detail_page(): void
+    {
+        $admin = new Admin();
+        $admin->email = 'admin@example.com';
+        $admin->password = Hash::make('nagoyameshi');
+        $admin->save();
+
+        $user = User::factory()->create();
+    
+        // 管理者としてログイン
+        $this->actingAs($admin);
+    
+        // 会員の詳細ページにアクセス
+        $response = $this->get(route('admin.users.show', ['user' => $user->id]));
+    
+        // リダイレクトされることを確認
+        $response->assertStatus(200);
     }
 }

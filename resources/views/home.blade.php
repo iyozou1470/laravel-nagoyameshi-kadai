@@ -50,35 +50,65 @@
         </div>
     </div>
 
-    <div class="container nagoyameshi-container">
-        <h2 class="mb-3">評価が高いお店</h2>
-        <div class="row row-cols-xl-6 row-cols-md-3 row-cols-2 g-3 mb-5">
-            @foreach ($highly_rated_restaurants as $highly_rated_restaurant)
-                <div class="col">
-                    <a href="#" class="link-dark nagoyameshi-card-link">
-                        <div class="card h-100">
-                            @if ($highly_rated_restaurant->image !== '')
-                                <img src="{{ asset('storage/restaurants/' . $highly_rated_restaurant->image) }}" class="card-img-top nagoyameshi-vertical-card-image">
-                            @else
-                                <img src="{{ asset('/images/no_image.jpg') }}" class="card-img-top nagoyameshi-vertical-card-image" alt="画像なし">
-                            @endif
-                            <div class="card-body">
-                                <h3 class="card-title">{{ $highly_rated_restaurant->name }}</h3>
-                                <div class="text-muted small mb-1">
-                                    @if ($highly_rated_restaurant->categories()->exists())
-                                        @foreach ($highly_rated_restaurant->categories as $index => $category)
-                                            <div class="d-inline-block">
-                                                @if ($index === 0)
-                                                    {{ $category->name }}
-                                                @else
-                                                    {{ ' ' . $category->name }}
-                                                @endif
-                                            </div>
-                                        @endforeach
+    @php
+    $defaultImages_1 = [
+        asset('/images/image_1.jpg'),
+        asset('/images/image_2.jpg'),
+        asset('/images/image_3.jpg'),
+        asset('/images/image_4.jpg'),
+        asset('/images/image_5.jpg'),
+        asset('/images/image_6.jpg'),
+    ];
+
+    $defaultImages_2 = [
+        asset('/images/image_1.jpg'),
+        asset('/images/image_2.jpg'),
+        asset('/images/image_3.jpg'),
+        asset('/images/image_4.jpg'),
+        asset('/images/image_5.jpg'),
+        asset('/images/image_6.jpg'),
+    ];
+
+    $imageIndex = 0;
+    @endphp
+
+<div class="container nagoyameshi-container">
+    <h2 class="mb-3">評価が高いお店</h2>
+    <div class="row row-cols-xl-6 row-cols-md-3 row-cols-2 g-3 mb-5">
+        @foreach ($highly_rated_restaurants as $highly_rated_restaurant)
+            @php
+                $suitable_image = $defaultImages_1[$imageIndex % count($defaultImages_1)];
+                $imageIndex++;
+            @endphp
+            <div class="col">
+                <a href="{{ route('restaurants.show', $highly_rated_restaurant) }}" class="link-dark nagoyameshi-card-link">
+                    <div class="card h-100">
+                        @if (!empty($highly_rated_restaurant->image))
+                            <img src="{{ asset('storage/restaurants/' . $highly_rated_restaurant->image) }}" class="card-img-top nagoyameshi-vertical-card-image">
+                        @else
+                            <img src="{{ $suitable_image }}" class="card-img-top nagoyameshi-vertical-card-image" alt="画像なし">
+                        @endif
+                        <div class="card-body">
+                            <h3 class="card-title">{{ $highly_rated_restaurant->name }}</h3>
+                            <div class="text-muted small mb-1">
+                                @if ($highly_rated_restaurant->categories()->exists())
+                                    @foreach ($highly_rated_restaurant->categories as $index => $category)
+                                        <div class="d-inline-block">
+                                            @if ($index === 0)
+                                                {{ $category->name }}
+                                            @else
+                                                {{ ' ' . $category->name }}
+                                            @endif
+                                        </div>
+                                    @endforeach
                                     @else
                                         <span>カテゴリ未設定</span>
                                     @endif
                                 </div>
+                                {{--<p class="card-text">
+                                    <span class="nagoyameshi-star-rating me-1" data-rate="{{ round($highly_rated_restaurant->reviews->avg('score') * 2) / 2 }}"></span>
+                                    {{ number_format(round($highly_rated_restaurant->reviews->avg('score'), 2), 2) }}
+                                </p>--}}
                             </div>
                         </div>
                     </a>
@@ -167,13 +197,17 @@
         <h2 class="mb-3">新規掲載店</h2>
         <div class="row row-cols-xl-6 row-cols-md-3 row-cols-2 g-3 mb-5">
             @foreach ($new_restaurants as $new_restaurant)
+            @php
+            $suitable_image = $defaultImages_2[$imageIndex % count($defaultImages_2)];
+            $imageIndex++;
+            @endphp
                 <div class="col">
-                    <a href="#" class="link-dark nagoyameshi-card-link">
+                    <a href="{{ route('restaurants.show', $new_restaurant) }}" class="link-dark nagoyameshi-card-link">
                         <div class="card h-100">
                             @if ($new_restaurant->image !== '')
                                 <img src="{{ asset('storage/restaurants/' . $new_restaurant->image) }}" class="card-img-top nagoyameshi-vertical-card-image">
                             @else
-                                <img src="{{ asset('/images/no_image.jpg') }}" class="card-img-top nagoyameshi-vertical-card-image" alt="画像なし">
+                            <img src="{{ $suitable_image }}" class="card-img-top nagoyameshi-vertical-card-image" alt="画像なし">
                             @endif
                             <div class="card-body">
                                 <h3 class="card-title">{{ $new_restaurant->name }}</h3>
