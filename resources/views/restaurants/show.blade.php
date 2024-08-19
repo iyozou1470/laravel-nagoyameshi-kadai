@@ -13,10 +13,6 @@
                 </nav>
 
                 <h1 class="mb-2 text-center">{{ $restaurant->name }}</h1>
-                {{--<p class="text-center">
-                    <span class="nagoyameshi-star-rating me-1" data-rate="{{ round($restaurant->reviews->avg('score') * 2) / 2 }}"></span>
-                    {{ number_format(round($restaurant->reviews->avg('score'), 2), 2) }}（{{ $restaurant->reviews->count() }}件）
-                </p>--}}
 
                 @if (session('flash_message'))
                     <div class="alert alert-info" role="alert">
@@ -28,12 +24,12 @@
                     <li class="nav-item">
                         <a class="nav-link active text-white nagoyameshi-bg" aria-current="page" href="{{ route('restaurants.show', $restaurant) }}">トップ</a>
                     </li>
-                    {{--<li class="nav-item">
-                        <a class="nav-link link-dark" href="{{ route('restaurants.reservations.create', $restaurant) }}">予約</a>
+                    <li class="nav-item">
+                        <a class="nav-link link-dark" href="#">予約</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link link-dark" href="{{ route('restaurants.reviews.index', $restaurant) }}">レビュー</a>
-                    </li>--}}
+                        <a class="nav-link link-dark" href="#">レビュー</a>
+                    </li>
                 </ul>
 
                 <div class="mb-2">
@@ -158,26 +154,6 @@
                             @endif
                         </div>
                     </div>
-
-                    {{--@guest
-                        <form action="{{ route('favorites.store', $restaurant->id) }}" method="post" class="text-center">
-                            @csrf
-                            <button type="submit" class="btn text-white shadow-sm w-50 nagoyameshi-btn">♥ お気に入り追加</button>
-                        </form>
-                    @else
-                        @if (Auth::user()->favorite_restaurants()->where('restaurant_id', $restaurant->id)->doesntExist())
-                            <form action="{{ route('favorites.store', $restaurant->id) }}" method="post" class="text-center">
-                                @csrf
-                                <button type="submit" class="btn text-white shadow-sm w-50 nagoyameshi-btn">♥ お気に入り追加</button>
-                            </form>
-                        @else
-                            <form action="{{ route('favorites.destroy', $restaurant->id) }}" method="post" class="text-center">
-                                @csrf
-                                @method('delete')
-                                <button type="submit" class="btn btn-outline-primary shadow-sm w-50 nagoyameshi-remove-favorite-button">♥ お気に入り解除</button>
-                            </form>
-                        @endif
-                    @endguest--}}
                 </div>
             </div>
         </div>

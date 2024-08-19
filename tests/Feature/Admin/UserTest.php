@@ -7,79 +7,119 @@ use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
 use App\Models\User;
 use App\Models\Admin;
-use Illuminate\Support\Facades\Hash;
 
 class UserTest extends TestCase
 {
     use RefreshDatabase;
 
-    //未ログインのユーザーは管理者側の会員一覧ページにアクセスできない
-    public function test_unauthenticated_user_cannnot_access_admin_list_page(): void 
+    /*
+    会員一覧ページ
+    未ログインのユーザーは管理者側の会員一覧ページにアクセスできない
+    ログイン済みの一般ユーザーは管理者側の会員一覧ページにアクセスできない
+    ログイン済みの管理者は管理者側の会員一覧ページにアクセスできる
+    */
+    public function test_gest_cannot_access_user_index()
     {
-        $response = $this->get('admin.users.index');
+        //未ログインユーザーが管理画面のユーザー一覧へアクセスしようとする
+        $response = $this->get(route("admin.users.index"));
 
-        $response->assertStatus(404);
+        // 失敗することを検証
+        $response->assertRedirect(route("admin.login"));
     }
 
-    //ログイン済みの一般ユーザーは管理者側の会員一覧ページにアクセスできない
-    public function test_authenticated_regular_user_cannot_access_admin_member_list_page(): void
+    public function test_user_cannot_access_user_index()
     {
+        // ユーザーを作成
         $user = User::factory()->create();
 
-        $response = $this->actingAs($user)->get('admin.users.index');
+        // ログイン操作を明示的にしたいときはこれ
+        // $response = $this->post('/login', [
+        //     'email' => $user->email,
+        //     'password' => $user->password,
+        // ]);
 
-        $response->assertStatus(404);
+        // ユーザーとしてログインした状態（actingAs）
+        $response = $this->actingAs($user, 'web')->get(route('admin.users.index'));
+
+        // 失敗すれば passed
+        $response->assertRedirect(route("admin.login"));
+
     }
 
-    //ログイン済みの管理者は管理者側の会員一覧ページにアクセスできる
-    public function test_authenticated_admin_can_access_admin_member_list_page(): void
+    public function test_admin_can_access_user_index()
     {
-        $admin = new Admin();
-        $admin->email = 'admin@example.com';
-        $admin->password = Hash::make('nagoyameshi');
-        $admin->save();
-     
-        $response = $this->post('admin/login', [
-            'email' => $admin->email,
-            'password' => 'nagoyameshi',
-        ]);
-        $response->assertRedirect(route('admin.home'));
-    }
-    //未ログインのユーザーは管理者側の会員詳細ページにアクセスできない
-    public function test_unauthenticated_user_cannnot_access_admin_detail_page(): void
-    {
-        $response = $this->get('admin.users.show');
+        // 管理者を作成
+        $admin = Admin::factory()->create();
 
-        $response->assertStatus(404);
-    }
+        // 明示的にログインしたいとき
+        // $this->post('/admin/login', [
+        //     'email' => $admin->email,
+        //     'password' => 'password',
+        // ]);
 
-    //ログイン済みの一般ユーザーは管理者側の会員詳細ページにアクセスできない
-    public function test_authenticated_regular_user_cannot_access_admin_member_detail_page(): void
-    {
-        $user = User::factory()->create();
+        // 管理者としてログイン済として、テスト
+        $response = $this->actingAs($admin, 'admin')->get(route('admin.users.index'));
 
-        $response = $this->actingAs($user)->get('admin.users.show');
-
-        $response->assertStatus(404);
-    }
-
-    //ログイン済みの管理者は管理者側の会員詳細ページにアクセスできる
-    public function test_authenticated_admin_can_access_admin_member_detail_page(): void
-    {
-        $admin = new Admin();
-        $admin->email = 'admin@example.com';
-        $admin->password = Hash::make('nagoyameshi');
-        $admin->save();
-
-        $user = User::factory()->create();
-    
-        // 管理者としてログイン
-        $this->actingAs($admin);
-    
-        // 会員の詳細ページにアクセス
-        $response = $this->get(route('admin.users.show', ['user' => $user->id]));
-    
-        // リダイレクトされることを確認
+        // 正常に遷移すれば passed
         $response->assertStatus(200);
     }
+
+
+    /*
+    会員詳細ページ
+    未ログインのユーザーは管理者側の会員詳細ページにアクセスできない
+    ログイン済みの一般ユーザーは管理者側の会員詳細ページにアクセスできない
+    ログイン済みの管理者は管理者側の会員詳細ページにアクセスできる
+    */
+    public function test_gest_cannot_access_user_show()
+    {
+        $user = User::factory()->create();
+
+        //未ログインユーザーが管理画面のユーザー一覧へアクセスしようとする
+        $response = $this->get(route("admin.users.show", $user));
+
+        // 失敗することを検証
+        $response->assertRedirect(route("admin.login"));
+    }
+
+    public function test_user_cannot_access_user_show()
+    {
+        // ユーザーを作成
+        $user = User::factory()->create();
+
+        // ログイン操作を明示的にしたいときはこれ
+        // $response = $this->post('/login', [
+        //     'email' => $user->email,
+        //     'password' => $user->password,
+        // ]);
+
+        // ユーザーとしてログインした状態（actingAs）
+        $response = $this->actingAs($user, 'web')->get(route('admin.users.show', $user));
+
+        // 失敗すれば passed
+        $response->assertRedirect(route("admin.login"));
+
+    }
+
+    public function test_admin_can_access_user_show()
+    {
+        // 管理者を作成
+        $admin = Admin::factory()->create();
+        $user = User::factory()->create();
+
+        // 明示的にログインしたいとき
+        // $this->post('/admin/login', [
+        //     'email' => $admin->email,
+        //     'password' => 'password',
+        // ]);
+
+        // 管理者としてログイン済として、テスト
+        $response = $this->actingAs($admin, 'admin')->get(route('admin.users.show', $user));
+
+        // 正常に遷移すれば passed
+        $response->assertStatus(200);
+    }
+
+
+
 }
