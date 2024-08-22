@@ -10,7 +10,7 @@ use App\Http\Controllers\Admin\TermController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\RestaurantController as UR;
-// use App\Http\Controllers\SubscriptionController;
+use App\Http\Controllers\SubscriptionController;
 // use App\Http\Controllers\ReviewController;
 // use App\Http\Controllers\ReservationController;
 // use App\Http\Controllers\FavoriteController;
@@ -72,18 +72,19 @@ Route::group(['middleware' => ['auth:web','verified']], function () {
     // レビュー機能のうち一般ユーザー向け
     //Route::get('/restaurants/{restaurant}/reviews', [ReviewController::class, 'index'])->name('restaurants.reviews.index');
 
-    // サブスクなし
-    // Route::group(['middleware' => 'not_subscribed'], function () {
-    //     Route::get('/subscription/create', [SubscriptionController::class, 'create'])->name('subscription.create');
-    //     Route::post('/subscription', [SubscriptionController::class, 'store'])->name('subscription.store');
-    // });
+     // サブスクなし
+Route::group(['middleware' => 'not_subscribed'], function () {
+    Route::get('/subscription/create', [SubscriptionController::class, 'create'])->name('subscription.create');
+    Route::post('/subscription', [SubscriptionController::class, 'store'])->name('subscription.store');
+});
 
-    // サブスクあり
-    // Route::group(['middleware' => 'subscribed'], function () {
-    //     Route::get('/subscription/edit', [SubscriptionController::class, 'edit'])->name('subscription.edit');
-    //     Route::patch('/subscription/update', [SubscriptionController::class, 'update'])->name('subscription.update');
-    //     Route::get('/subscription/cancel', [SubscriptionController::class, 'cancel'])->name('subscription.cancel');
-    //     Route::delete('/subscription/destroy', [SubscriptionController::class, 'destroy'])->name('subscription.destroy');
+// サブスクあり
+Route::group(['middleware' => 'subscribed'], function () {
+    Route::get('/subscription/edit', [SubscriptionController::class, 'edit'])->name('subscription.edit');
+    Route::patch('/subscription/update', [SubscriptionController::class, 'update'])->name('subscription.update');
+    Route::get('/subscription/cancel', [SubscriptionController::class, 'cancel'])->name('subscription.cancel');
+    Route::delete('/subscription/destroy', [SubscriptionController::class, 'destroy'])->name('subscription.destroy');
+});
 
     //     // レビュー機能
     //     Route::get('/restaurants/{restaurant}/reviews/create', [ReviewController::class, 'create'])->name('restaurants.reviews.create');

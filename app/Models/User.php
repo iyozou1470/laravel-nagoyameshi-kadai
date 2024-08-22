@@ -2,16 +2,20 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
-use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Kyslik\ColumnSortable\Sortable;
+use Laravel\Cashier\Billable;
+//use App\Models\Review;
+//use App\Models\Reservation;
+//use App\Models\Restaurant;
 
 class User extends Authenticatable implements MustVerifyEmail
 {
-    use HasApiTokens, HasFactory, Notifiable;
+    use HasApiTokens, HasFactory, Notifiable, Sortable, Billable;
 
     /**
      * The attributes that are mass assignable.
@@ -49,4 +53,21 @@ class User extends Authenticatable implements MustVerifyEmail
         'email_verified_at' => 'datetime',
         'password' => 'hashed',
     ];
+
+    //public function reviews()
+    //{
+    //    return $this->hasMany(Review::class);
+    //}
+
+    //public function reservations()
+    //{
+    //    return $this->hasMany(Reservation::class);
+    //}
+
+    //public function favorite_restaurants()
+    //{
+    //    return $this->belongsToMany(Restaurant::class)->withTimestamps();
+   // }
+
+    
 }
