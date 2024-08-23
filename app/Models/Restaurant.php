@@ -8,7 +8,7 @@ use App\Models\Category;
 use App\Models\RegularHoliday;
 use Kyslik\ColumnSortable\Sortable;
 use App\Models\Review;
-//use App\Models\Reservation;
+use App\Models\Reservation;
 use App\Models\User;
 
 class Restaurant extends Model
@@ -41,14 +41,14 @@ class Restaurant extends Model
         return $query->withAvg('reviews', 'score')->orderBy('reviews_avg_score', $direction);
     }
 
-    //public function reservations()
-    //{
-        //return $this->hasMany(Reservation::class);
-    //}
+    public function reservations()
+    {
+        return $this->hasMany(Reservation::class);
+    }
 
-    //public function popularSortable($query, $direction) {
-    //    return $query->withCount('reservations')->orderBy('reservations_count', $direction);
-    //}
+    public function popularSortable($query, $direction) {
+        return $query->withCount('reservations')->orderBy('reservations_count', $direction);
+    }
 
     public function favorited_users()
     {
