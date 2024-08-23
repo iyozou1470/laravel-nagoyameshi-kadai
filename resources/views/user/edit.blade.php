@@ -1,8 +1,8 @@
 @extends('layouts.app')
 
-@push('scripts')
+{{--@push('scripts')
     <script src="{{ asset('/js/reservation-modal.js') }}"></script>
-@endpush
+@endpush--}}
 
 @section('content')
     <div class="container nagoyameshi-container pb-5">

@@ -105,10 +105,10 @@
                                         <span>カテゴリ未設定</span>
                                     @endif
                                 </div>
-                                {{--<p class="card-text">
+                                <p class="card-text">
                                     <span class="nagoyameshi-star-rating me-1" data-rate="{{ round($highly_rated_restaurant->reviews->avg('score') * 2) / 2 }}"></span>
                                     {{ number_format(round($highly_rated_restaurant->reviews->avg('score'), 2), 2) }}
-                                </p>--}}
+                                </p>
                             </div>
                         </div>
                     </a>

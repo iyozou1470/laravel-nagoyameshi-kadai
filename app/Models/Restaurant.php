@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use App\Models\Category;
 use App\Models\RegularHoliday;
 use Kyslik\ColumnSortable\Sortable;
-//use App\Models\Review;
+use App\Models\Review;
 //use App\Models\Reservation;
 use App\Models\User;
 
@@ -32,14 +32,14 @@ class Restaurant extends Model
         return $this->belongsToMany(RegularHoliday::class)->withTimestamps();
     }
 
-    //public function reviews()
-    //{
-        //return $this->hasMany(Review::class);
-    //}
+    public function reviews()
+    {
+        return $this->hasMany(Review::class);
+    }
 
-    //public function ratingSortable($query, $direction) {
-    //    return $query->withAvg('reviews', 'score')->orderBy('reviews_avg_score', $direction);
-    //}
+    public function ratingSortable($query, $direction) {
+        return $query->withAvg('reviews', 'score')->orderBy('reviews_avg_score', $direction);
+    }
 
     //public function reservations()
     //{

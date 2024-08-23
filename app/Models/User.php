@@ -9,7 +9,7 @@ use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 use Kyslik\ColumnSortable\Sortable;
 use Laravel\Cashier\Billable;
-//use App\Models\Review;
+use App\Models\Review;
 //use App\Models\Reservation;
 //use App\Models\Restaurant;
 
@@ -54,10 +54,10 @@ class User extends Authenticatable implements MustVerifyEmail
         'password' => 'hashed',
     ];
 
-    //public function reviews()
-    //{
-    //    return $this->hasMany(Review::class);
-    //}
+    public function reviews()
+    {
+        return $this->hasMany(Review::class);
+    }
 
     //public function reservations()
     //{

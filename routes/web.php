@@ -11,7 +11,7 @@ use App\Http\Controllers\HomeController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\RestaurantController as UR;
 use App\Http\Controllers\SubscriptionController;
-// use App\Http\Controllers\ReviewController;
+use App\Http\Controllers\ReviewController;
 // use App\Http\Controllers\ReservationController;
 // use App\Http\Controllers\FavoriteController;
 use App\Http\Controllers\CompanyController as User_Company_Cont;
@@ -69,8 +69,8 @@ Route::group(['middleware' => ['auth:web','verified']], function () {
     Route::get('/user/{user}/edit', [UserController::class, 'edit'])->name('user.edit');
     Route::patch('/user/{user}', [UserController::class, 'update'])->name('user.update');
 
-    // レビュー機能のうち一般ユーザー向け
-    //Route::get('/restaurants/{restaurant}/reviews', [ReviewController::class, 'index'])->name('restaurants.reviews.index');
+    // 一般ユーザー向けのレビュー機能
+    Route::get('/restaurants/{restaurant}/reviews', [ReviewController::class, 'index'])->name('restaurants.reviews.index');
 
      // サブスクなし
 Route::group(['middleware' => 'not_subscribed'], function () {
@@ -86,12 +86,12 @@ Route::group(['middleware' => 'subscribed'], function () {
     Route::delete('/subscription/destroy', [SubscriptionController::class, 'destroy'])->name('subscription.destroy');
 });
 
-    //     // レビュー機能
-    //     Route::get('/restaurants/{restaurant}/reviews/create', [ReviewController::class, 'create'])->name('restaurants.reviews.create');
-    //     Route::post('/restaurants/{restaurant}/reviews', [ReviewController::class, 'store'])->name('restaurants.reviews.store');
-    //     Route::get('/restaurants/{restaurant}/reviews/{review}/edit', [ReviewController::class, 'edit'])->name('restaurants.reviews.edit');
-    //     Route::patch('/restaurants/{restaurant}/reviews/{review}', [ReviewController::class, 'update'])->name('restaurants.reviews.update');
-    //     Route::delete('/restaurants/{restaurant}/reviews/{review}', [ReviewController::class, 'destroy'])->name('restaurants.reviews.destroy');
+         // レビュー機能
+         Route::get('/restaurants/{restaurant}/reviews/create', [ReviewController::class, 'create'])->name('restaurants.reviews.create');
+         Route::post('/restaurants/{restaurant}/reviews', [ReviewController::class, 'store'])->name('restaurants.reviews.store');
+         Route::get('/restaurants/{restaurant}/reviews/{review}/edit', [ReviewController::class, 'edit'])->name('restaurants.reviews.edit');
+         Route::patch('/restaurants/{restaurant}/reviews/{review}', [ReviewController::class, 'update'])->name('restaurants.reviews.update');
+         Route::delete('/restaurants/{restaurant}/reviews/{review}', [ReviewController::class, 'destroy'])->name('restaurants.reviews.destroy');
 
     //     // 予約機能
     //     Route::get('/reservations', [ReservationController::class, 'index'])->name('reservations.index');
