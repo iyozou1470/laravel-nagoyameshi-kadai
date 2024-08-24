@@ -63,9 +63,9 @@ use App\Http\Controllers\TermController;
           Route::resource('reservations', ReservationController::class)->only(['index', 'destroy']);
           Route::resource('restaurants.reservations', ReservationController::class)->only(['create', 'store']);
         
-          //Route::get('favorites', [FavoriteController::class, 'index'])->name('favorites.index');
-          //Route::post('favorites/{restaurant_id}', [FavoriteController::class, 'store'])->name('favorites.store');
-          //Route::delete('favorites/{restaurant_id}', [FavoriteController::class, 'destroy'])->name('favorites.destroy');
+          Route::get('favorites', [FavoriteController::class, 'index'])->name('favorites.index');
+          Route::post('favorites/{restaurant_id}', [FavoriteController::class, 'store'])->name('favorites.store');
+          Route::delete('favorites/{restaurant_id}', [FavoriteController::class, 'destroy'])->name('favorites.destroy');
        
         });
       });
