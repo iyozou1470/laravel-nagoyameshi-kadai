@@ -1,220 +1,203 @@
 <?php
 
 namespace Tests\Feature;
-
+use App\Models\Admin;
+use App\Models\User;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
-use App\Models\User;
-use App\Models\Admin;
 
 class UserTest extends TestCase
 {
     /**
      * A basic feature test example.
      */
+    /*public function test_example(): void
+    {
+        $response = $this->get('/');
+
+        $response->assertStatus(200);
+    }*/
+
     use RefreshDatabase;
 
-    public function test_guest_can_access_user_index()
+    // ---
+    //index
+    // ---
+    public function test_guest_cannot_access_user_index()
     {
-        //未ログインユーザーが管理画面のユーザー一覧へアクセスしようとする
         $response = $this->get(route('user.index'));
 
-        // 失敗することを検証
-        $response->assertRedirect('/login');
+        $response->assertRedirect(route('login'));
     }
 
+    // ログイン済みの一般ユーザーは会員側の会員情報ページにアクセスできる
     public function test_user_can_access_user_index()
     {
-        // ユーザーを作成
         $user = User::factory()->create();
 
-        // ログイン操作を明示的にしたいときはこれ
-        // $response = $this->post('/login', [
-        //     'email' => $user->email,
-        //     'password' => $user->password,
-        // ]);
+        $response = $this->actingAs($user)->get(route('user.index'));
 
-        // ユーザーとしてログインした状態（actingAs）
-        $response = $this->actingAs($user, 'web')->get(route('user.index'));
         $response->assertStatus(200);
     }
 
+    // ログイン済みの管理者は会員側の会員情報ページにアクセスできない
     public function test_admin_cannot_access_user_index()
     {
-        // 管理者を作成
-        $admin = Admin::factory()->create();
+        $admin = new Admin();
+        $admin->email = 'admin@example.com';
+        $admin->password = Hash::make('nagoyameshi');
+        $admin->save();
 
-        // 明示的にログインしたいとき
-        // $this->post('/admin/login', [
-        //     'email' => $admin->email,
-        //     'password' => 'password',
-        // ]);
-
-        // 管理者としてログイン済として、テスト
         $response = $this->actingAs($admin, 'admin')->get(route('user.index'));
-        $response->assertRedirect('/login');
-        // $response->assertRedirect(route('admin.home'));
 
+        $response->assertRedirect(route('admin.home'));
     }
 
-    // edit 4つ
-    // edit
-    public function test_guest_cannot_edit_user()
+     // ---
+     //edit
+     // ---
+    // 未ログインのユーザーは会員側の会員情報編集ページにアクセスできない
+    public function test_guest_cannot_access_user_edit()
     {
         $user = User::factory()->create();
-        $response = $this->get(route("user.edit", $user));
-        $response->assertRedirect('/login');
+
+        $response = $this->get(route('user.edit', $user));
+
+        $response->assertRedirect(route('login'));
     }
-    public function test_user_cannot_edit_other_user()
+
+    // ログイン済みの一般ユーザーは会員側の他人の会員情報編集ページにアクセスできない
+    public function test_user_cannot_access_others_user_edit()
     {
         $user = User::factory()->create();
-        $user2 = User::factory()->create();
-        $response = $this->actingAs($user, 'web')->get(route('user.edit', $user2));
+        $other_user = User::factory()->create();
+
+        $response = $this->actingAs($user)->get(route('user.edit', $other_user));
+
         $response->assertRedirect(route('user.index'));
     }
 
-    public function test_user_can_edit_user()
+    // ログイン済みの一般ユーザーは会員側の自身の会員情報編集ページにアクセスできる
+    public function test_user_can_access_own_user_edit()
     {
         $user = User::factory()->create();
-        $response = $this->actingAs($user, 'web')->get(route('user.edit', $user));
+
+        $response = $this->actingAs($user)->get(route('user.edit', $user));
+
         $response->assertStatus(200);
     }
-    public function test_admin_cannot_edit_user()
-    {
-        $admin = Admin::factory()->create();
-        $response = $this->actingAs($admin, 'admin')->get(route('user.edit', $admin));
-        $response->assertRedirect('/login');
-    }
 
-    // update 
-    public function test_guest_cannot_update_user()
+    // ログイン済みの管理者は会員側の会員情報編集ページにアクセスできない
+    public function test_admin_cannot_access_user_edit()
     {
-        $old_user = User::factory()->create([
-            'name' => 'before',
-        ]);
+        $admin = new Admin();
+        $admin->email = 'admin@example.com';
+        $admin->password = Hash::make('nagoyameshi');
+        $admin->save();
+
+        $user = User::factory()->create();
+
+        $response = $this->actingAs($admin, 'admin')->get(route('user.edit', $user));
+
+        $response->assertRedirect(route('admin.home'));
+    }
+     // ---
+     //update
+     // ---
+     // 未ログインのユーザーは会員情報を更新できない
+    public function test_guest_cannot_access_user_update()
+    {
+        $old_user = User::factory()->create();
+
         $new_user_data = [
-            'name' => 'after',
-            'kana' => 'ア',
-            'email' => 'aiu@email.com',
+            'name' => 'テスト更新',
+            'kana' => 'テストコウシン',
+            'email' => 'test.update@example.com',
             'postal_code' => '1234567',
-            'address' => 'あ',
-            'phone_number' => '09011111111',
-            'birthday' => '19001010',
-            'occupation' => 'あ',
+            'address' => 'テスト更新',
+            'phone_number' => '0123456789',
+            'birthday' => '20150319',
+            'occupation' => 'テスト更新'
         ];
+
         $response = $this->patch(route('user.update', $old_user), $new_user_data);
 
-        // DBが更新されたかチェック
-        // $this->assertEquals(User::find($old_user->id)->name, $new_user_data['name']);
-        $this->assertNotEquals(User::find($old_user->id)->name, $new_user_data['name']);
-
-        // $response->assertRedirect(route('user.index'));
-        $response->assertRedirect('/login');
-
+        $this->assertDatabaseMissing('users', $new_user_data);
+        $response->assertRedirect(route('login'));
     }
-    public function test_user_cannot_update_other_user()
+
+    // ログイン済みの一般ユーザーは他人の会員情報を更新できない
+    public function test_user_cannot_access_others_user_update()
     {
-        $other_user = User::factory()->create([
-            'name' => 'other',
-        ]);
-        $old_user = User::factory()->create([
-            'name' => 'before',
-        ]);
+    
+        $user = User::factory()->create();
+        $old_other_user = User::factory()->create();
 
-        // print ('==========================================================================================' . "\n");
-        // print ('=== Userテーブル    ' . "\n");
-        // print ('==========================================================================================' . "\n");
-        // print_r(User::all()->toArray());
-
-        $new_user_data = [
-            'name' => 'after',
-            'kana' => 'ア',
-            'email' => 'aiu@email.com',
+        $new_other_user_data = [
+            'name' => 'テスト更新',
+            'kana' => 'テストコウシン',
+            'email' => 'test.update@example.com',
             'postal_code' => '1234567',
-            'address' => 'あ',
-            'phone_number' => '09011111111',
-            'birthday' => '19001010',
-            'occupation' => 'あ',
+            'address' => 'テスト更新',
+            'phone_number' => '0123456789',
+            'birthday' => '20150319',
+            'occupation' => 'テスト更新'
         ];
-        $response = $this->actingAs($other_user, 'web')->patch(route('user.update', $old_user), $new_user_data);
 
-        // print ('==========================================================================================' . "\n");
-        // print ('=== update後のUserテーブル    ' . "\n");
-        // print ('==========================================================================================' . "\n");
-        // print_r(User::all()->toArray());
+        $response = $this->actingAs($user)->patch(route('user.update', $old_other_user), $new_other_user_data);
 
-
-        // DBが更新されたかチェック
-        // $this->assertEquals(User::find($old_user->id)->name, $new_user_data['name']);
-        $this->assertNotEquals(User::find($old_user->id)->name, $new_user_data['name']);
-
+        $this->assertDatabaseMissing('users', $new_other_user_data);
         $response->assertRedirect(route('user.index'));
-        // $response->assertRedirect('/login');
-
     }
-    public function test_user_can_update__user()
+
+    // ログイン済みの一般ユーザーは自身の会員情報を更新できる
+    public function test_user_can_access_own_user_update()
     {
-        $old_user = User::factory()->create([
-            'name' => 'before',
-        ]);
+        $old_user = User::factory()->create();
+
         $new_user_data = [
-            'name' => 'after',
-            'kana' => 'ア',
-            'email' => 'aiu@email.com',
+            'name' => 'テスト更新',
+            'kana' => 'テストコウシン',
+            'email' => 'test.update@example.com',
             'postal_code' => '1234567',
-            'address' => 'あ',
-            'phone_number' => '09011111111',
-            'birthday' => '19001010',
-            'occupation' => 'あ',
+            'address' => 'テスト更新',
+            'phone_number' => '0123456789',
+            'birthday' => '20150319',
+            'occupation' => 'テスト更新'
         ];
-        $response = $this->actingAs($old_user, 'web')->patch(route('user.update', $old_user), $new_user_data);
 
-        // DBが更新されたかチェック
-        $this->assertEquals(User::find($old_user->id)->name, $new_user_data['name']);
-        // $this->assertNotEquals(User::find($old_user_id)->name, $new_user_data['name']);
+        $response = $this->actingAs($old_user)->patch(route('user.update', $old_user), $new_user_data);
 
+        $this->assertDatabaseHas('users', $new_user_data);
         $response->assertRedirect(route('user.index'));
-        // $response->assertRedirect('/login');
-
     }
-    public function test_admin_cannot_update_company()
-    {
-        $admin = Admin::factory()->create();
-        $old_user = User::factory()->create([
-            'name' => 'before',
-        ]);
 
-        // print ('==========================================================================================' . "\n");
-        // print ('=== Userテーブル    ' . "\n");
-        // print ('==========================================================================================' . "\n");
-        // print_r(User::all()->toArray());
+    // ログイン済みの管理者は会員情報を更新できない
+    public function test_admin_cannot_access_user_update()
+    {
+        $admin = new Admin();
+        $admin->email = 'admin@example.com';
+        $admin->password = Hash::make('nagoyameshi');
+        $admin->save();
+
+        $old_user = User::factory()->create();
 
         $new_user_data = [
-            'name' => 'after',
-            'kana' => 'ア',
-            'email' => 'aiu@email.com',
+            'name' => 'テスト更新',
+            'kana' => 'テストコウシン',
+            'email' => 'test.update@example.com',
             'postal_code' => '1234567',
-            'address' => 'あ',
-            'phone_number' => '09011111111',
-            'birthday' => '19001010',
-            'occupation' => 'あ',
+            'address' => 'テスト更新',
+            'phone_number' => '0123456789',
+            'birthday' => '20150319',
+            'occupation' => 'テスト更新'
         ];
+
         $response = $this->actingAs($admin, 'admin')->patch(route('user.update', $old_user), $new_user_data);
-
-        // print ('==========================================================================================' . "\n");
-        // print ('=== update後のUserテーブル    ' . "\n");
-        // print ('==========================================================================================' . "\n");
-        // print_r(User::all()->toArray());
-
-
-        // DBが更新されたかチェック
-        // 更新された
-        // $this->assertEquals(User::find($old_user->id)->name, $new_user_data['name']);
-        // 更新されなかった
-        $this->assertNotEquals(User::find($old_user->id)->name, $new_user_data['name']);
-
-        // $response->assertRedirect(route('user.index'));
-        $response->assertRedirect('/login');
+        $this->assertDatabaseMissing('users', $new_user_data);
+        $response->assertRedirect(route('admin.home'));
     }
+
 }
