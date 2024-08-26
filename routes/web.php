@@ -13,6 +13,7 @@ use App\Http\Controllers\ReservationController;
 use App\Http\Controllers\FavoriteController;
 use App\Http\Controllers\CompanyController;
 use App\Http\Controllers\TermController;
+use App\Http\Controllers\ProfileController;
 
 Route::group(['middleware' => 'guest:admin'], function () {
     // Home
@@ -55,6 +56,17 @@ Route::group(['middleware' => 'guest:admin'], function () {
             Route::post('favorites/{restaurant_id}', [FavoriteController::class, 'store'])->name('favorites.store');
             Route::delete('favorites/{restaurant_id}', [FavoriteController::class, 'destroy'])->name('favorites.destroy');
         });
+
+        Route::middleware(['auth', 'verified'])->group(function () {
+          // プロフィール表示ページ
+          Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+          
+          // プロフィール更新
+          Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
+          
+          // プロフィール削除
+          Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+      });
     });
 });
 
